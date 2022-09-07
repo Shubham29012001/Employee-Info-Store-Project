@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { jwtSecret, accessTokenLife } = require('../config/config');
 
 const employeeSchema = new mongoose.Schema(
     {
@@ -61,5 +63,17 @@ const employeeSchema = new mongoose.Schema(
 employeeSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, 10);;
     next();
-})
+});
+
+employeeSchema.methods.createJWT = function () {
+    return jwt.sign({ userId: this._id, name: this.name, email: this.email, userType: this.userType },
+        jwtSecret, { expiresIn: accessTokenLife });
+};
+
+employeeSchema.methods.comparePassword = async function (password) {
+    const comparePass = await bcrypt.compare(password, this.password);
+    return comparePass;
+
+}
+
 module.exports = mongoose.model('employee', employeeSchema);
