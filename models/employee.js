@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const employeeSchema = new mongoose.Schema(
     {
@@ -29,10 +30,8 @@ const employeeSchema = new mongoose.Schema(
             minLength: 15,
         },
         dob: {
-            type: String,
+            type: Date,
             required: [true, 'Please provide the dob of employee'],
-            maxLength: 10,
-            minLength: 10,
         },
         designation: {
             type: String,
@@ -51,8 +50,16 @@ const employeeSchema = new mongoose.Schema(
             type: String,
             maxLength: 30,
         },
+        joiningDate: {
+            type: Date,
+            default: Date.now
+        }
     },
     { timestamps: true }
 );
 
+employeeSchema.pre('save', async function (next) {
+    this.password = await bcrypt.hash(this.password, 10);;
+    next();
+})
 module.exports = mongoose.model('employee', employeeSchema);

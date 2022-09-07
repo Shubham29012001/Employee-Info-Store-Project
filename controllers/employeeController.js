@@ -38,11 +38,11 @@ const deleteIndividualEmployeeDetails = async (req, res) => {
 const updateIndividualEmployeeDetail = async (req, res) => {
     const id = req.params.id;
 
-    const { name, dob, address, designation, team, seat, reportingTo, email } = req.body;
+    const { name, dob, address, designation, team, seat, reportingTo, email, joiningDate } = req.body;
 
-    if (name || dob || address || designation || team || seat || reportingTo || email) {
+    if (name || dob || address || designation || team || seat || reportingTo || email || joiningDate) {
         const individualEmployee = await employee.findByIdAndUpdate({ _id: id },
-            { name: name, dob: dob, address: address, designation: designation, team: team, seat: seat, reportingTo: reportingTo, email: email },
+            { name, dob, address, designation, team, seat, reportingTo, email, joiningDate },
             { new: true, runValidators: true }
         );
 
