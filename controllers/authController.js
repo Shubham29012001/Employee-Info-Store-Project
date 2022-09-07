@@ -1,6 +1,6 @@
 const employee = require('../models/employee');
 const bcrypt = require('bcrypt');
-
+const { badRequestError } = require('../errors/')
 const loginController = async (req, res) => {
     res.status(200).send("loginController Route and Controller");
 }
@@ -13,7 +13,7 @@ const signupController = async (req, res) => {
     const address = req.body.address;
 
     if (!name || !dob || !email || !password || !address) {
-        res.status(400).json({ msg: "Please provide complete details" });
+        throw new badRequestError("Please provide complete details");;
     }
 
     const hashPassword = await bcrypt.hash(password, 10);

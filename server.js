@@ -13,10 +13,14 @@ const employeeRoute = require('./routes/employeeRoute');
 const authRoute = require('./routes/authRoute');
 const pageNotFoundRoute = require('./routes/pageNotFoundRoute');
 
+const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware');
+
 app.use(express.json());
 app.use('/api/v1/', authRoute);
 app.use('/api/v1/employees/', employeeRoute);
 app.use('*', pageNotFoundRoute);
+
+app.use(errorHandlerMiddleware);
 
 const startServer = async () => {
     try {

@@ -1,4 +1,5 @@
 const employee = require('../models/employee');
+const { badRequestError } = require('../errors/')
 
 const getEmployeeDetails = async (req, res) => {
     const employees = await employee.find({});
@@ -11,9 +12,12 @@ const getIndividualEmployeeDetails = async (req, res) => {
 
     const individualEmployee = await employee.findById({ _id: id });
 
-    individualEmployee ?
-        res.status(200).json({ individualEmployee }) :
-        res.status(400).json({ msg: `No Employee with id ${id}` })
+    if (individualEmployee) {
+        res.status(200).json({ individualEmployee });
+    }
+    else {
+        throw new badRequestError(`No Employee with id ${id}`);
+    }
 };
 
 const deleteIndividualEmployeeDetails = async (req, res) => {
@@ -21,9 +25,13 @@ const deleteIndividualEmployeeDetails = async (req, res) => {
 
     const deleteEmployee = await employee.findByIdAndRemove({ _id: id });
 
-    deleteEmployee ?
-        res.status(200).json({ deleteEmployee, msg: "Employee deleted successfully" }) :
-        res.status(400).json({ msg: `No Employee with id ${id}` })
+    if (deleteEmployee) {
+        res.status(200).json({ deleteEmployee, msg: "Employee deleted successfully" });
+    }
+    else {
+        throw new badRequestError(`No Employee with id ${id}`);
+    }
+
 };
 
 
@@ -32,18 +40,21 @@ const updateIndividualEmployeeDetail = async (req, res) => {
 
     const { name, dob, address, designation, team, seat, reportingTo, email } = req.body;
 
-    if (!name || !dob || !address || !designation || !team || !seat || !reportingTo || !email) {
-        res.status(400).json({ msg: "Please provide details of employee" });
-    }
-    else {
+    if (name || dob || address || designation || team || seat || reportingTo || email) {
         const individualEmployee = await employee.findByIdAndUpdate({ _id: id },
             { name: name, dob: dob, address: address, designation: designation, team: team, seat: seat, reportingTo: reportingTo, email: email },
             { new: true, runValidators: true }
         );
 
-        individualEmployee ?
-            res.status(200).json({ individualEmployee, msg: "Update Successfully" }) :
-            res.status(400).json({ msg: `No employee with id ${id}` });
+        if (individualEmployee) {
+            res.status(200).json({ individualEmployee, msg: "Update Successfully" });
+        }
+        else {
+            throw new badRequestError(`No Employee with id ${id}`);
+        }
+    }
+    else {
+        throw new badRequestError("Please provide details of employee");
     }
 };
 
