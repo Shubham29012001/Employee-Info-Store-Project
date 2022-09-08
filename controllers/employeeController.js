@@ -1,16 +1,45 @@
 const employee = require('../models/employee');
-const { badRequestError } = require('../errors/')
+const { badRequestError, customAPIError } = require('../errors/')
 
 const getEmployeeDetails = async (req, res) => {
-    const { page } = req.query;
+    const { sort, team, designation, reporting } = req.query;
 
-    let limit = 2;
-    let skip = (parseInt(page) - 1) * limit;
+    let limit = parseInt(req.query.limit) || 10;
+    let page = parseInt(req.query.page) || 1;
+    let skip = (page - 1) * limit;
 
-    const totalEmployees = await employee.countDocuments({});
+    let queryObject = {};
 
-    const employees = await employee.find({}).select('-password').limit(limit).skip(skip);
-    res.status(200).json({ employees, totalPages: Math.ceil((totalEmployees / limit)), currentPage: parseInt(page) });
+    if (team && team !== 'all') {
+        queryObject.team = team;
+    }
+
+    if (designation && designation !== 'all') {
+        queryObject.designation = designation;
+    }
+
+    if (reporting) {
+        queryObject.reportingTo = reporting;
+    }
+
+    let employees = employee.find(queryObject).select('-password');
+
+    if (sort === 'latest') {
+        employees = employees.sort('-joiningDate');
+    }
+
+    if (sort === 'oldest') {
+        employees = employees.sort('joiningDate');
+    }
+
+    employees = employees.skip(skip).limit(limit);
+
+    const completeEmployee = await employees;
+
+    const totalEmployees = await employee.countDocuments(queryObject);
+    const numberOfPages = Math.ceil(totalEmployees / limit);
+
+    res.status(200).json({ completeEmployee, totalEmployees, numberOfPages });
 };
 
 const getIndividualEmployeeDetails = async (req, res) => {
@@ -25,6 +54,24 @@ const getIndividualEmployeeDetails = async (req, res) => {
         throw new badRequestError(`No Employee with id ${id}`);
     }
 };
+
+const getEmployeeByTeam = async (req, res) => {
+    const id = req.params.id;
+
+    const currentEmployee = await employee.findOne({ _id: id }).select('-password');
+
+    if (currentEmployee) {
+        let currentEmployeeTeam = currentEmployee.team;
+        const teamEmployee = await employee.find({ team: currentEmployeeTeam }).select('-password');
+
+        if (teamEmployee) {
+            res.status(200).json({ teamEmployee });
+        }
+    }
+    else {
+        throw new customAPIError("Current employee don't have any team");
+    }
+}
 
 const deleteIndividualEmployeeDetails = async (req, res) => {
     const id = req.params.id;
@@ -68,4 +115,5 @@ module.exports = {
     deleteIndividualEmployeeDetails,
     getIndividualEmployeeDetails,
     updateIndividualEmployeeDetail,
+    getEmployeeByTeam
 }
