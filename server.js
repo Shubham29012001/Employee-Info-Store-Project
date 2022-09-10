@@ -17,6 +17,7 @@ const PORT = process.env.PORT || 8080;
 const { authenticate } = require('./middleware/authenicate');
 
 const employeeRoute = require('./routes/employeeRoute');
+const meetingRoute = require('./routes/meetingRoute');
 const authRoute = require('./routes/authRoute');
 const pageNotFoundRoute = require('./routes/pageNotFoundRoute');
 
@@ -35,6 +36,7 @@ app.use(cors());
 
 app.use('/api/v1/', authRoute);
 app.use('/api/v1/employees/', authenticate, employeeRoute);
+app.use('/api/v1/meetings/', authenticate, meetingRoute);
 app.use('*', pageNotFoundRoute);
 
 app.use(errorHandlerMiddleware);
