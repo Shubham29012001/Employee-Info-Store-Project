@@ -55,6 +55,16 @@ const employeeSchema = new mongoose.Schema(
         joiningDate: {
             type: Date,
             default: Date.now
+        },
+        preferenceStartTime: {
+            type: String,
+        },
+        preferenceEndTime: {
+            type: String,
+        },
+        userType: {
+            type: Number,
+            default: 255
         }
     },
     { timestamps: true }

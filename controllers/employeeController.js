@@ -34,7 +34,7 @@ const getEmployeeDetails = async (req, res) => {
 
     employees = employees.skip(skip).limit(limit);
 
-    const completeEmployee = await employees;
+    const completeEmployee = await employees.select('-password').select('-userType');
 
     const totalEmployees = await employee.countDocuments(queryObject);
     const numberOfPages = Math.ceil(totalEmployees / limit);
@@ -45,7 +45,7 @@ const getEmployeeDetails = async (req, res) => {
 const getIndividualEmployeeDetails = async (req, res) => {
     const id = req.params.id;
 
-    const individualEmployee = await employee.findById({ _id: id }).select('-password');
+    const individualEmployee = await employee.findById({ _id: id }).select('-password').select('-userType');
 
     if (individualEmployee) {
         res.status(200).json({ individualEmployee });
@@ -62,7 +62,7 @@ const getEmployeeByTeam = async (req, res) => {
 
     if (currentEmployee) {
         let currentEmployeeTeam = currentEmployee.team;
-        const teamEmployee = await employee.find({ team: currentEmployeeTeam }).select('-password');
+        const teamEmployee = await employee.find({ team: currentEmployeeTeam }).select('-password').select('-userType');
 
         if (teamEmployee) {
             res.status(200).json({ teamEmployee });
@@ -76,7 +76,7 @@ const getEmployeeByTeam = async (req, res) => {
 const deleteIndividualEmployeeDetails = async (req, res) => {
     const id = req.params.id;
 
-    const deleteEmployee = await employee.findByIdAndRemove({ _id: id });
+    const deleteEmployee = await employee.findByIdAndRemove({ _id: id }).select('-userType');
 
     if (deleteEmployee) {
         res.status(200).json({ deleteEmployee, msg: "Employee deleted successfully" });
@@ -90,13 +90,13 @@ const deleteIndividualEmployeeDetails = async (req, res) => {
 const updateIndividualEmployeeDetail = async (req, res) => {
     const id = req.params.id;
 
-    const { name, dob, address, designation, team, seat, reportingTo, email, joiningDate } = req.body;
+    const { name, dob, address, designation, team, seat, reportingTo, email, joiningDate, preferenceStartTime, preferenceEndTime, userType } = req.body;
 
-    if (name || dob || address || designation || team || seat || reportingTo || email || joiningDate) {
+    if (name || dob || address || designation || team || seat || reportingTo || email || joiningDate || preferenceStartTime || preferenceEndTime || userType) {
         const individualEmployee = await employee.findByIdAndUpdate({ _id: id },
-            { name, dob, address, designation, team, seat, reportingTo, email, joiningDate },
+            { name, dob, address, designation, team, seat, reportingTo, email, joiningDate, preferenceStartTime, preferenceEndTime, userType },
             { new: true, runValidators: true }
-        ).select('-password');
+        ).select('-password').select('-userType');
 
         if (individualEmployee) {
             res.status(200).json({ individualEmployee, msg: "Update Successfully" });

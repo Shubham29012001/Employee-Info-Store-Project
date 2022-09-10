@@ -22,16 +22,15 @@ const loginController = async (req, res) => {
 }
 
 const signupController = async (req, res) => {
-    const name = req.body.name;
-    const dob = req.body.dob;
-    const email = req.body.email;
-    const password = req.body.password;
-    const address = req.body.address;
-    const userType = 100;
+    const { name, dob, email, password, address, userType } = req.body;
+
     const designation = "";
     const team = "";
     const seat = "";
     const reportingTo = "";
+
+    const preferenceStartTime = req.body.preferenceStartTime || "T13:00:00";
+    const preferenceEndTime = req.body.preferenceEndTime || "T23:00:00";
 
     if (!name || !dob || !email || !password || !address) {
         throw new badRequestError("Please provide complete details");;
@@ -43,7 +42,7 @@ const signupController = async (req, res) => {
         throw new customAPIError('User Already Exists');
     }
 
-    const createEmployee = await employee.create({ name, dob, email, password, address, userType, designation, team, seat, reportingTo });
+    const createEmployee = await employee.create({ name, dob, email, password, address, userType, designation, team, seat, reportingTo, preferenceEndTime, preferenceStartTime });
     const accessToken = createEmployee.createJWT();
     res.status(201).json({ createEmployee, accessToken, msg: "Employee created successfully" });
 }
