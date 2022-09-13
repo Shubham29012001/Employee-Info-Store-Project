@@ -1,0 +1,12 @@
+.add-btn {
+  text-align: right;
+}
+
+.container {
+  overflow: auto;
+}
+
+.navlink {
+  color: white !important;
+  margin-bottom: 1rem;
+}

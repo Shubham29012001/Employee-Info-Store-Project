@@ -56,9 +56,9 @@ const getIndividualEmployeeDetails = async (req, res) => {
 };
 
 const getEmployeeByTeam = async (req, res) => {
-    const id = req.params.id;
-
-    const currentEmployee = await employee.findOne({ _id: id }).select('-password');
+    const { email } = req.user;
+    console.log(email)
+    const currentEmployee = await employee.findOne({ email: email }).select('-password');
 
     if (currentEmployee) {
         let currentEmployeeTeam = currentEmployee.team;

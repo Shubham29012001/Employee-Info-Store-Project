@@ -3,8 +3,7 @@ const { badRequestError, unauthenticateError } = require('../errors/')
 const { jwtSecret, accessTokenLife } = require('../config/config');
 
 const authenticate = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-
+    const authHeader = req.headers.authorization || req.headers.Authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         throw new unauthenticateError("No Authorization Token");
     }

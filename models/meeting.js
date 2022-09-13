@@ -8,7 +8,6 @@ const meetingSchema = new mongoose.Schema(
         meetCreatedBy: {
             type: String,
             required: [true, "Please mention the creator ID"],
-            ref: "employee",
         },
         meetMembers: [
             {
@@ -23,7 +22,7 @@ const meetingSchema = new mongoose.Schema(
             type: Date,
             required: [true, 'Please provide the meeting schedule']
         },
-        
+
     },
     { timestamps: true }
 );

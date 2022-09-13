@@ -14,7 +14,21 @@ const loginController = async (req, res) => {
 
     if (comparePass) {
         const accessToken = user.createJWT();
-        res.status(200).json({ accessToken, msg: "Login successfully" });
+        res.status(200).json({
+            name: user.name,
+            dob: user.dob,
+            email: user.email,
+            address: user.address,
+            designation: user.designation,
+            team: user.team,
+            seat: user.seat,
+            reportingTo: user.reportingTo,
+            preferenceEndTime: user.preferenceEndTime,
+            preferenceStartTime: user.preferenceStartTime,
+            userType: user.userType,
+            accessToken,
+            msg: "Login successfully"
+        });
     }
     else {
         throw new unauthenticateError('Please provide correct credentials')
@@ -44,7 +58,21 @@ const signupController = async (req, res) => {
 
     const createEmployee = await employee.create({ name, dob, email, password, address, userType, designation, team, seat, reportingTo, preferenceEndTime, preferenceStartTime });
     const accessToken = createEmployee.createJWT();
-    res.status(201).json({ createEmployee, accessToken, msg: "Employee created successfully" });
+    res.status(201).json({
+        name: createEmployee.name,
+        dob: createEmployee.dob,
+        email: createEmployee.email,
+        address: createEmployee.address,
+        designation: createEmployee.designation,
+        team: createEmployee.team,
+        seat: createEmployee.seat,
+        reportingTo: createEmployee.reportingTo,
+        preferenceEndTime: createEmployee.preferenceEndTime,
+        preferenceStartTime: createEmployee.preferenceStartTime,
+        userType: createEmployee.userType,
+        accessToken,
+        msg: "Employee created successfully"
+    });
 }
 
 module.exports = {

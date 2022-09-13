@@ -1,0 +1,20 @@
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+h3 {
+  font-size: 20px !important;
+  margin-top: 3px;
+  font-weight: bold;
+  padding: 0.8rem;
+}
+
+span {
+  font-size: 18px;
+  font-weight: normal;
+}
+
+.btn {
+  float: right;
+}

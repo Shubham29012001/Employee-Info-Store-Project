@@ -5,6 +5,6 @@ const { getEmployeeByTeam, getEmployeeDetails, getIndividualEmployeeDetails, del
 
 router.route('/').get(getEmployeeDetails);
 router.route('/employee/:id').get(getIndividualEmployeeDetails).delete(deleteIndividualEmployeeDetails).put(updateIndividualEmployeeDetail);
-router.route('/employee/team/:id').get(getEmployeeByTeam);
+router.route('/employee/team/').post(getEmployeeByTeam);
 
 module.exports = router;
