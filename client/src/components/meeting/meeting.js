@@ -11,6 +11,8 @@ import {
     loginContext
 } from '../context/contextProvider.js';
 
+import { toast } from 'react-toastify';
+
 import AuthServices from '../../ApiServices/authServices.js';
 
 const Meeting = () => {
@@ -56,12 +58,13 @@ const Meeting = () => {
         try {
             const { data: res } = await AuthServices.deleteMeeting(id);
             if (res) {
+                toast.success("Meeting Deleted Successfully");
                 getMeetingsData();
                 setdeleteMeetData(deleteMeetData);
             }
         }
         catch (error) {
-            console.log(error.response.data.msg);
+            toast.error(error.response.data.msg);
         }
     }
 

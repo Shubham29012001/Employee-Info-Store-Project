@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
+import "./admin.css";
 
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import EditIcon from '@mui/icons-material/Edit';
@@ -10,6 +11,9 @@ import {
   deleteUserDataContext,
   loginContext
 } from '../context/contextProvider.js';
+
+import BadgeIcon from '@mui/icons-material/Badge';
+import { toast } from 'react-toastify';
 
 import AuthServices from '../../ApiServices/authServices.js';
 
@@ -58,19 +62,21 @@ const Admin = () => {
       if (res) {
         getEmployeesData();
         setdeleteUserData(deleteUserData);
+        toast.success("Employee Deleted Succesfully")
       }
     }
     catch (error) {
-      console.log(error.response.data.msg);
+      toast.error(error.response.data.msg);
     }
   }
 
   return (
     <>
+
       <div className="mt-5">
         <div className="container">
           <h1>
-            Employees
+            <BadgeIcon /> Employees
           </h1>
           <table className="table mt-5">
             <thead>
@@ -123,13 +129,13 @@ const Admin = () => {
             </tbody>
           </table>
 
-          {loginData.userType === 755 && <ul className="pagination">
+          {loginData.userType === 755 && <ul className="pagination justify-content-center">
             <li className="page-item">
               <button className="page-link" onClick={() => {
                 setPageNumber(Math.max(0, pageNumber - 1));
               }} aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
-                <span className="sr-only">Previous</span>
+                <span className="sr-only"></span>
               </button>
             </li>
             {pages.map((pageIndex) => {
@@ -145,7 +151,7 @@ const Admin = () => {
               }}
                 aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
-                <span className="sr-only">Next</span>
+                <span className="sr-only"></span>
               </button>
             </li>
           </ul>}

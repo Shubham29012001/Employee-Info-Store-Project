@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import { addMeetDataContext, loginContext } from "../context/contextProvider.js";
 import AuthServices from "../../ApiServices/authServices.js";
+import { toast } from 'react-toastify';
 
 const CreateMeeting = () => {
     const history = useNavigate("");
@@ -31,6 +32,7 @@ const CreateMeeting = () => {
             const { data: res } = await AuthServices.createMeeting(data);
             if (res) {
                 setmeetData(res);
+                toast.success("Meeting Created Successfully");
                 if (loginData.userType === 755) {
                     history("/meetings");
                 }
@@ -40,7 +42,7 @@ const CreateMeeting = () => {
             }
         }
         catch (error) {
-            console.log(error.response.data.msg);
+            toast.error(error.response.data.msg);
         }
     };
     return (

@@ -3,6 +3,13 @@ import styles from './styles.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthServices from '../../ApiServices/authServices.js';
 import { loginContext } from '../context/contextProvider.js';
+import BadgeIcon from '@mui/icons-material/Badge';
+import CakeIcon from '@mui/icons-material/Cake';
+import EmailIcon from '@mui/icons-material/Email';
+import PasswordIcon from '@mui/icons-material/Password';
+import HomeIcon from '@mui/icons-material/Home';
+import Fade from 'react-reveal/Fade';
+import { toast } from 'react-toastify';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -25,6 +32,7 @@ const Signup = () => {
     try {
       const { data: res } = await AuthServices.signup(data);
       if (res) {
+        toast.success('User Signed Up Successfully');
         localStorage.setItem('userDetails', JSON.stringify(res));
         navigate('/dashboard');
         setloginData(res);
@@ -35,92 +43,116 @@ const Signup = () => {
         error.response.status >= 400 &&
         error.response.status <= 500
       ) {
-        console.log(error.response.data.msg);
+        toast.error(error.response.data.msg);
       }
     }
   };
 
   return (
-    <div className={styles.signup_container}>
-      <div className={styles.signup_form_container}>
-        <div className={styles.left}>
-          <h1>Welcome Back</h1>
-          <Link to="/login">
-            <button type="button" className={styles.white_btn}>
-              Sign in
-            </button>
-          </Link>
-        </div>
-        <div className={styles.right}>
-          <form className={styles.form_container} onSubmit={handleSubmit}>
-            <h1>Create Account</h1>
-            <input
-              type="text"
-              placeholder="Enter Your Full Name"
-              name="name"
-              onChange={handleChange}
-              value={data.name}
-              required
-              className={styles.input}
-              aria-describedby="nameHelp"
-            />
-            <input
-              type="date"
-              placeholder="Enter Your Date of Birth"
-              name="dob"
-              onChange={handleChange}
-              value={data.dob}
-              required
-              className={styles.input}
-              aria-describedby="dobHelp"
-            />
-            <input
-              type="email"
-              placeholder="Enter Your Email"
-              name="email"
-              onChange={handleChange}
-              value={data.email}
-              required
-              className={styles.input}
-              aria-describedby="emailHelp"
-            />
-            <input
-              type="password"
-              placeholder="Enter Your Password"
-              name="password"
-              onChange={handleChange}
-              value={data.password}
-              required
-              className={styles.input}
-              aria-describedby="passwordHelp"
-            />
-            <input
-              type="password"
-              placeholder="Confirm Your Password"
-              name="confirmPassword"
-              onChange={handleChange}
-              value={data.confirmPassword}
-              required
-              className={styles.input}
-              aria-describedby="confirmPasswordHelp"
-            />
-            <input
-              type="text"
-              placeholder="Enter Your Address"
-              name="address"
-              onChange={handleChange}
-              value={data.address}
-              required
-              className={styles.input}
-              aria-describedby="addressHelp"
-            />
-            <button type="submit" className={styles.green_btn}>
-              Sign Up
-            </button>
-          </form>
+    <Fade>
+      <div className={styles.signup_container}>
+        <div className={styles.signup_form_container}>
+          <div className={styles.left}>
+            <h1>Welcome Back</h1>
+            <Link to="/login">
+              <button type="button" className={styles.white_btn}>
+                Sign in
+              </button>
+            </Link>
+          </div>
+          <div className={styles.right}>
+            <form className={styles.form_container} onSubmit={handleSubmit}>
+              <h1>Create Account</h1>
+              <div className='input'>
+                <BadgeIcon />
+                <input
+                  type="text"
+                  placeholder="Enter Your Full Name"
+                  name="name"
+                  onChange={handleChange}
+                  value={data.name}
+                  required
+                  className={styles.input}
+                  aria-describedby="nameHelp"
+                />
+              </div>
+              <div className='input'>
+                <CakeIcon />
+                <input
+                  type="date"
+                  placeholder="Enter Your Date of Birth"
+                  name="dob"
+                  onChange={handleChange}
+                  value={data.dob}
+                  required
+                  className={styles.input}
+                  aria-describedby="dobHelp"
+                />
+              </div>
+
+              <div className='input'>
+                <EmailIcon />
+                <input
+                  type="email"
+                  placeholder="Enter Your Email"
+                  name="email"
+                  onChange={handleChange}
+                  value={data.email}
+                  required
+                  className={styles.input}
+                  aria-describedby="emailHelp"
+                />
+              </div>
+
+              <div className='input'>
+                <PasswordIcon />
+                <input
+                  type="password"
+                  placeholder="Enter Your Password"
+                  name="password"
+                  onChange={handleChange}
+                  value={data.password}
+                  required
+                  className={styles.input}
+                  aria-describedby="passwordHelp"
+                />
+              </div>
+
+              <div className='input'>
+                <PasswordIcon />
+
+                <input
+                  type="password"
+                  placeholder="Confirm Your Password"
+                  name="confirmPassword"
+                  onChange={handleChange}
+                  value={data.confirmPassword}
+                  required
+                  className={styles.input}
+                  aria-describedby="confirmPasswordHelp"
+                />
+              </div>
+              <div className='input'>
+                <HomeIcon />
+                <input
+                  type="text"
+                  placeholder="Enter Your Address"
+                  name="address"
+                  onChange={handleChange}
+                  value={data.address}
+                  required
+                  className={styles.input}
+                  aria-describedby="addressHelp"
+                />
+              </div>
+              <button type="submit" className={styles.green_btn}>
+                Sign Up
+              </button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </Fade>
   );
 };
 

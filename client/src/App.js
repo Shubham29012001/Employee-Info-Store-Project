@@ -15,6 +15,9 @@ import EditMeeting from './components/editmeeting/editmeeting.js';
 
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../node_modules/bootstrap/dist/js/bootstrap.bundle.min';
+import '../node_modules/react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 
 import { loginContext } from './components/context/contextProvider.js';
 import CreateMeeting from './components/createmeeting/createmeeting.js';
@@ -35,7 +38,7 @@ function App() {
             <Route path="/meetings" exact element={<Meeting />} />
             <Route path="/meetings/create" exact element={<CreateMeeting />} />
             <Route path="/meetings/edit/:id" exact element={<EditMeeting />} />
-            <Route path="/edit/:id" exact element={<Edit />} />
+            <Route path="/admin/edit/:id" exact element={<Edit />} />
             <Route path="/view/:id" exact element={<Detail />} />
           </>
         ) : (
@@ -52,8 +55,8 @@ function App() {
               )}
           </>
         )}
-
       </Routes>
+      <ToastContainer autoClose={2000} limit={3} />
     </>
   );
 }

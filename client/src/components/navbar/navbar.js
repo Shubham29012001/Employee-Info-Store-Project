@@ -1,6 +1,10 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginContext } from '../context/contextProvider';
+import LoginIcon from '@mui/icons-material/Login';
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
+
+import "./navbar.css";
 
 const Navbar = () => {
 
@@ -26,25 +30,25 @@ const Navbar = () => {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul className="navbar-nav me-auto my-2 my-lg-0 register">
               {!loginData &&
                 <>
                   <li className="nav-item">
                     <Link
-                      className="nav-link active"
+                      className="nav-link"
                       aria-current="page"
                       to="/login"
                     >
-                      Login
+                      <LoginIcon /> Login
                     </Link>
                   </li>
                   <li className="nav-item">
                     <Link
-                      className="nav-link active"
+                      className="nav-link"
                       aria-current="page"
                       to="/signup"
                     >
-                      Signup
+                      <AppRegistrationIcon /> Signup
                     </Link>
                   </li>
                 </>
@@ -65,7 +69,7 @@ const Navbar = () => {
                   </form>
                   <li className="nav-item">
                     <Link
-                      className="nav-link active"
+                      className="nav-link "
                       aria-current="page"
                       to="/admin"
                     >
@@ -74,7 +78,7 @@ const Navbar = () => {
                   </li>
                   <li className="nav-item">
                     <Link
-                      className="nav-link active"
+                      className="nav-link "
                       aria-current="page"
                       to="/meetings"
                     >
@@ -87,7 +91,7 @@ const Navbar = () => {
               {loginData && loginData.userType &&
                 <li className="nav-item">
                   <button
-                    className="nav-link active"
+                    className="nav-link "
                     aria-current="page"
                     onClick={() => {
                       localStorage.removeItem('userDetails');

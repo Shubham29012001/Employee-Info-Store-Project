@@ -3,6 +3,10 @@ import styles from './styles.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthServices from '../../ApiServices/authServices.js';
 import { loginContext } from '../context/contextProvider.js';
+import EmailIcon from '@mui/icons-material/Email';
+import PasswordIcon from '@mui/icons-material/Password';
+import Fade from 'react-reveal/Fade';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [loginData, setloginData] = useContext(loginContext);
@@ -23,6 +27,7 @@ const Login = () => {
       if (res) {
         localStorage.setItem('userDetails', JSON.stringify(res));
         setloginData(res);
+        toast.success("Login Successfully");
         res.userType === 755 ? history('/admin') : history('/dashboard');
       }
     } catch (error) {
@@ -31,55 +36,62 @@ const Login = () => {
         error.response.status >= 400 &&
         error.response.status <= 500
       ) {
-        console.log(error.response.data.msg);
+        toast.error(error.response.data.msg);
       }
     }
   };
 
   return (
-    <div className={styles.login_container}>
-      <div className={styles.login_form_container}>
-        <div className={styles.left}>
-          <form className={styles.form_container} onSubmit={handleSubmit}>
-            <h1>Login to Your Account</h1>
+    <Fade>
+      <div className={styles.login_container}>
+        <div className={styles.login_form_container}>
+          <div className={styles.left}>
+            <form className={styles.form_container} onSubmit={handleSubmit}>
+              <h1>Login to Your Account</h1>
+              <div className='input'>
+                <EmailIcon />
+                <input
+                  type="email"
+                  placeholder="Enter Your Email"
+                  name="email"
+                  onChange={handleChange}
+                  value={data.email}
+                  required
+                  className={styles.input}
+                  aria-describedby="emailHelp"
+                />
+              </div>
+              <div className='input'>
+                <PasswordIcon />
+                <input
+                  type="password"
+                  placeholder="Enter Your Password"
+                  name="password"
+                  onChange={handleChange}
+                  value={data.password}
+                  required
+                  className={styles.input}
+                  aria-describedby="passwordHelp"
+                />
+              </div>
+              <button type="submit" className={styles.green_btn}>
+                Login
+              </button>
+            </form>
+          </div>
+          <div className={styles.right}>
+            <h1>New User?</h1>
+            <Link to="/signup">
+              <button type="button" className={styles.white_btn}>
+                Sign Up
+              </button>
+            </Link>
 
-            <input
-              type="email"
-              placeholder="Enter Your Email"
-              name="email"
-              onChange={handleChange}
-              value={data.email}
-              required
-              className={styles.input}
-              aria-describedby="emailHelp"
-            />
-            <input
-              type="password"
-              placeholder="Enter Your Password"
-              name="password"
-              onChange={handleChange}
-              value={data.password}
-              required
-              className={styles.input}
-              aria-describedby="passwordHelp"
-            />
-
-            <button type="submit" className={styles.green_btn}>
-              Login
-            </button>
-          </form>
-        </div>
-        <div className={styles.right}>
-          <h1>New User?</h1>
-          <Link to="/signup">
-            <button type="button" className={styles.white_btn}>
-              Sign Up
-            </button>
-          </Link>
-
+          </div>
         </div>
       </div>
-    </div>
+    </Fade>
+
   );
 };
 
