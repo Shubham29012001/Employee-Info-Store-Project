@@ -29,27 +29,37 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const { data: res } = await AuthServices.signup(data);
-      if (res) {
-        toast.success('User Signed Up Successfully');
-        localStorage.setItem('userDetails', JSON.stringify(res));
-        navigate('/dashboard');
-        setloginData(res);
-      }
-    } catch (error) {
-      if (
-        error.response &&
-        error.response.status >= 400 &&
-        error.response.status <= 500
-      ) {
-        toast.error(error.response.data.msg);
+
+    if (!data.name || !data.dob || !data.email || !data.password || !data.confirmPassword || !data.address) {
+      toast.error("Please provide complete input details");
+    }
+    else if (data.password !== data.confirmPassword) {
+      toast.error("Password and Confirm Password are not same");
+    }
+    else {
+      try {
+        const { data: res } = await AuthServices.signup(data);
+        if (res) {
+          toast.success('User Signed Up Successfully');
+          localStorage.setItem('userDetails', JSON.stringify(res));
+          setloginData(res);
+
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        if (
+          error.response &&
+          error.response.status >= 400 &&
+          error.response.status <= 500
+        ) {
+          toast.error(error.response.data.msg);
+        }
       }
     }
   };
 
   return (
-    <Fade>
+    <Fade duration={700}>
       <div className={styles.signup_container}>
         <div className={styles.signup_form_container}>
           <div className={styles.left}>

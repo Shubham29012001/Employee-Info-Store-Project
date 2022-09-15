@@ -16,6 +16,7 @@ const EditMeeting = () => {
     const [loginData, setloginData] = useContext(loginContext);
 
     const [data, setData] = useState({
+        meetingRoom: "",
         meetTitle: "",
         meetCreatedBy: "",
         meetMembers: "",
@@ -49,26 +50,35 @@ const EditMeeting = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        try {
-            const { data: res } = await AuthServices.updateMeeting(id, data);
-            if (res) {
-                toast.success('Meeting Updated Successfully');
-                setupdateMeetData(res);
-                if (loginData.userType !== 755) {
-                    history("/dashboard");
-                }
-                else {
-                    history("/meetings");
+        if (!data.meetingRoom || !data.meetStartingTime || !data.meetEndingTime || !data.meetMembers || !data.meetTitle) {
+            toast.error("Please provide complete input");
+        }
+        else if (data.meetStartingTime >= data.meetEndingTime) {
+            toast.error("Please Provide Proper Timing for Meeting")
+        }
+        else {
+            try {
+                const { data: res } = await AuthServices.updateMeeting(id, data);
+                if (res) {
+                    toast.success('Meeting Updated Successfully');
+                    setupdateMeetData(res);
+                    if (loginData.userType !== 755) {
+                        history("/dashboard");
+                    }
+                    else {
+                        history("/meetings");
+                    }
                 }
             }
+            catch (error) {
+                toast.error(error.response.data.msg);
+            }
         }
-        catch (error) {
-            toast.error(error.response.data.msg);
-        }
+
     };
 
     return (
-        <Zoom>
+        <Zoom duration={500}>
             <div className="container mt-3 mb-4">
                 <form onSubmit={handleSubmit}>
                     <div className="row">
@@ -141,6 +151,20 @@ const EditMeeting = () => {
                                 value={data.meetEndingTime}
                                 onChange={handleChange}
                             />
+                        </div>
+                        <div className="mb-3 col-lg-6 col-md-6 col-12">
+                            <label htmlFor="meetTitle" className="form-label">
+                                Meet Room No
+                            </label>
+                            <select class="form-select" aria-label="Default select example" id="meetingRoom" name="meetingRoom" onChange={handleChange} value={data.meetingRoom}>
+                                <option disabled selected>Meeting Room</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
                         </div>
                         <button type="submit" className="btn btn-primary mt-3">
                             Submit

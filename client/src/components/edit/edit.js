@@ -52,21 +52,26 @@ const Edit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const { data: res } = await AuthServices.updateEmployee(id, data);
-      if (res) {
-        toast.success('Employee Updated Successfully');
-        setupdateUserData(res);
-        history("/admin");
-      }
+    if (!data.name || !data.address || !data.designation || !data.dob || !data.email || !data.joiningDate || !data.preferenceEndTime || !data.preferenceStartTime || !data.reportingTo || !data.team || !data.seat) {
+      toast.error("Please provide complete input details");
     }
-    catch (error) {
-      toast.error(error.response.data.msg);
+    else {
+      try {
+        const { data: res } = await AuthServices.updateEmployee(id, data);
+        if (res) {
+          toast.success('Employee Updated Successfully');
+          setupdateUserData(res);
+          history("/admin");
+        }
+      }
+      catch (error) {
+        toast.error(error.response.data.msg);
+      }
     }
   };
 
   return (
-    <Zoom>
+    <Zoom duration={500}>
       <div className="container mt-3 mb-4">
         <form onSubmit={handleSubmit}>
           <div className="row">

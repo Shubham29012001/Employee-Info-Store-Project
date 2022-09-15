@@ -62,6 +62,7 @@ const getIndividualMeetingDetails = async (req, res) => {
 
 const createMeetingDetails = async (req, res) => {
     const { meetTitle, meetCreatedBy } = req.body;
+    let meetingRoom = req.body.meetingRoom;
     let meetStartingTime = req.body.meetStartingTime;
     let meetEndingTime = req.body.meetEndingTime;
     let meetMembers = req.body.meetMembers;
@@ -77,30 +78,65 @@ const createMeetingDetails = async (req, res) => {
         const memberAlreadyMeet = [];
         const totalDuration = (meetEndingTime - meetStartingTime) / 3600000;
         const memberName = [];
+        console.log(meetingRoom)
+        const findMeetRoomSchedule = await meeting.findOne({ meetingRoom, meetStartingTime, meetEndingTime });
+        if (!findMeetRoomSchedule) {
+            for (let i = 0; i < meetMembers.length; i++) {
+                const memberResult = await employee.findOne({ email: meetMembers[i] }).select('name');
 
-        for (let i = 0; i < meetMembers.length; i++) {
-            const memberResult = await employee.findOne({ email: meetMembers[i] }).select('name');
-            memberName.push(memberResult.name);
-            const isMemberConflict = await meeting.findOne({ meetMembers: meetMembers[i], meetStartingTime, meetEndingTime });
+                if (memberResult) {
+                    memberName.push(memberResult.name);
+                }
+                else {
+                    throw new badRequestError("Employee not found");
+                }
+                const isMemberConflict = await meeting.findOne({ meetMembers: meetMembers[i], meetStartingTime, meetEndingTime });
 
-            if (isMemberConflict) {
-                memberAlreadyMeet.push(memberName[i]);
+                if (isMemberConflict) {
+                    memberAlreadyMeet.push(memberName[i]);
+                }
+            }
+
+            if (memberAlreadyMeet.length == 0) {
+                const createMeeting = await meeting.create({ meetingRoom, meetTitle, meetCreatedBy, meetMembers, meetStartingTime, meetEndingTime });
+                res.status(201).json({ createMeeting, msg: "Meet created successfully" });
+            }
+            else {
+                throw new badRequestError(`[${memberAlreadyMeet}] is already in meet for particular slot`);
+            }
+        }
+        else {
+            const previousMeetTiming = findMeetRoomSchedule.meetEndingTime;
+            console.log(previousMeetTiming, new Date(meetStartingTime))
+            let remainingTime = previousMeetTiming.getTime() - new Date(meetStartingTime).getTime();
+            remainingTime = remainingTime / 60000;
+            let otherMeetRooms = [];
+            for (let i = 1; i < 7; i++) {
+                if (i == meetingRoom) {
+                    continue;
+                }
+                else {
+                    const findOtherRoom = await meeting.findOne({ meetingRoom: i, meetStartingTime, meetEndingTime });
+                    if (!findOtherRoom) {
+                        otherMeetRooms.push(i);
+                    }
+                }
+            }
+
+            if (otherMeetRooms.length === 0) {
+                throw new badRequestError('No meeting room available for the slot');
+            }
+            else {
+                throw new customAPIError(`Meeting Room Booked. Remaining Time - ${remainingTime} minutes. ${otherMeetRooms} Rooms available for the slot`)
             }
         }
 
-        if (memberAlreadyMeet.length == 0) {
-            const createMeeting = await meeting.create({ meetTitle, meetCreatedBy, meetMembers, meetStartingTime, meetEndingTime });
-            res.status(201).json({ createMeeting, msg: "Meet created successfully" });
-        }
-        else {
-            throw new badRequestError(`[${memberAlreadyMeet}] is already in meet for particular slot`);
-        }
     }
 }
 
 
 const updateIndividualMeetingDetails = async (req, res) => {
-    const { meetTitle, meetCreatedBy } = req.body;
+    const { meetTitle, meetCreatedBy, meetingRoom } = req.body;
     let meetStartingTime = req.body.meetStartingTime;
     let meetEndingTime = req.body.meetEndingTime;
 
@@ -113,32 +149,57 @@ const updateIndividualMeetingDetails = async (req, res) => {
     if (!meetTitle || !meetCreatedBy || !meetStartingTime || !meetEndingTime || !meetMembers) {
         throw new badRequestError('Please provide any details');
     }
+
     else {
-        const isMeet = await meeting.findById({ _id: meetID });
-        if (isMeet) {
-            const memberAlreadyMeet = [];
-            const memberName = [];
+        const findMeetRoomSchedule = await meeting.findOne({ meetingRoom, meetStartingTime, meetEndingTime });
+        if (!findMeetRoomSchedule) {
+            const isMeet = await meeting.findById({ _id: meetID });
+            if (isMeet) {
+                const memberAlreadyMeet = [];
+                const memberName = [];
 
-            for (let i = 0; i < meetMembers.length; i++) {
-                const memberResult = await employee.findOne({ email: meetMembers[i] }).select('name');
-                memberName.push(memberResult.name);
-                const isMemberConflict = await meeting.findOne({ meetMembers: meetMembers[i], meetStartingTime: meetStartingTime, meetEndingTime: meetEndingTime });
+                for (let i = 0; i < meetMembers.length; i++) {
+                    const memberResult = await employee.findOne({ email: meetMembers[i] }).select('name');
+                    memberName.push(memberResult.name);
+                    const isMemberConflict = await meeting.findOne({ meetMembers: meetMembers[i], meetStartingTime: meetStartingTime, meetEndingTime: meetEndingTime });
 
-                if (isMemberConflict) {
-                    memberAlreadyMeet.push(memberName[i]);
+                    if (isMemberConflict) {
+                        memberAlreadyMeet.push(memberName[i]);
+                    }
+                }
+
+                if (memberAlreadyMeet.length == 0) {
+                    const updateMeeting = await meeting.findByIdAndUpdate({ _id: meetID }, { meetTitle, meetCreatedBy, meetMembers, meetStartingTime, meetEndingTime }, { new: true, runValidators: true });
+                    res.status(200).json({ updateMeeting, msg: "Meet updated successfully" });
+                }
+                else {
+                    throw new badRequestError(`[${memberAlreadyMeet}] is already in meeting`);
                 }
             }
-
-            if (memberAlreadyMeet.length == 0) {
-                const updateMeeting = await meeting.findByIdAndUpdate({ _id: meetID }, { meetTitle, meetCreatedBy, meetMembers, meetStartingTime, meetEndingTime }, { new: true, runValidators: true });
-                res.status(200).json({ updateMeeting, msg: "Meet updated successfully" });
-            }
             else {
-                throw new badRequestError(`[${memberAlreadyMeet}] is already in meet slot`);
+                throw new badRequestError(`No meeting found with the ID`);
             }
         }
         else {
-            throw new badRequestError(`No meeting found with the ID`);
+            let otherMeetRooms = [];
+            for (let i = 1; i < 7; i++) {
+                if (i == meetingRoom) {
+                    continue;
+                }
+                else {
+                    const findOtherRoom = await meeting.findOne({ meetingRoom: i, meetStartingTime, meetEndingTime });
+                    if (!findOtherRoom) {
+                        otherMeetRooms.push(i);
+                    }
+                }
+            }
+
+            if (otherMeetRooms.length === 0) {
+                throw new badRequestError('No meeting room available for the slot');
+            }
+            else {
+                throw new customAPIError(`Meeting Room Booked. ${otherMeetRooms} Rooms available for the slot`)
+            }
         }
     }
 };
@@ -157,8 +218,9 @@ const deleteMeeting = async (req, res) => {
 };
 
 const abortFromMeeting = async (req, res) => {
-    const userID = req.body.id;
+    const userID = req.user.email;
     const meetID = req.params.id;
+    console.log(userID, meetID)
 
     const isUserMeet = await meeting.findOne({ _id: meetID, meetMembers: userID });
     if (isUserMeet) {
@@ -180,7 +242,6 @@ const abortFromMeeting = async (req, res) => {
     else {
         throw new badRequestError('Please provide correct meet ID or User not in Meet');
     }
-
 };
 
 const getMeetingByIndividual = async (req, res) => {

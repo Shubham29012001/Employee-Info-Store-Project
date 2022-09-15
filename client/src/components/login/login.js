@@ -22,27 +22,32 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const { data: res } = await AuthServices.login(data);
-      if (res) {
-        localStorage.setItem('userDetails', JSON.stringify(res));
-        setloginData(res);
-        toast.success("Login Successfully");
-        res.userType === 755 ? history('/admin') : history('/dashboard');
-      }
-    } catch (error) {
-      if (
-        error.response &&
-        error.response.status >= 400 &&
-        error.response.status <= 500
-      ) {
-        toast.error(error.response.data.msg);
+    if (!data.email || !data.password) {
+      toast.error("Please provide complete input");
+    }
+    else {
+      try {
+        const { data: res } = await AuthServices.login(data);
+        if (res) {
+          localStorage.setItem('userDetails', JSON.stringify(res));
+          setloginData(res);
+          toast.success("Login Successfully");
+          res.userType === 755 ? history('/admin') : history('/dashboard');
+        }
+      } catch (error) {
+        if (
+          error.response &&
+          error.response.status >= 400 &&
+          error.response.status <= 500
+        ) {
+          toast.error(error.response.data.msg);
+        }
       }
     }
   };
 
   return (
-    <Fade>
+    <Fade duration={700}>
       <div className={styles.login_container}>
         <div className={styles.login_form_container}>
           <div className={styles.left}>

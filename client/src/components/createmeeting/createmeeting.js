@@ -14,6 +14,7 @@ const CreateMeeting = () => {
     const [loginData, setloginData] = useContext(loginContext);
 
     const [data, setData] = useState({
+        meetingRoom: "",
         meetTitle: "",
         meetCreatedBy: loginData.email,
         meetMembers: "",
@@ -27,28 +28,37 @@ const CreateMeeting = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(data);
-        try {
-            const { data: res } = await AuthServices.createMeeting(data);
-            if (res) {
-                setmeetData(res);
-                toast.success("Meeting Created Successfully");
-                if (loginData.userType === 755) {
-                    history("/meetings");
-                }
-                else {
-                    history("/dashboard");
+        if (!data.meetingRoom || !data.meetStartingTime || !data.meetEndingTime || !data.meetMembers || !data.meetTitle) {
+            toast.error("Please provide complete input");
+        }
+        else if (data.meetStartingTime >= data.meetEndingTime) {
+            toast.error("Please Provide Proper Timing for Meeting")
+        }
+        else {
+            try {
+                const { data: res } = await AuthServices.createMeeting(data);
+                if (res) {
+                    setmeetData(res);
+                    toast.success("Meeting Created Successfully");
+                    if (loginData.userType === 755) {
+                        history("/meetings");
+                    }
+                    else {
+                        history("/dashboard");
+                    }
                 }
             }
+            catch (error) {
+                toast.error(error.response.data.msg);
+            }
         }
-        catch (error) {
-            toast.error(error.response.data.msg);
-        }
+
     };
     return (
         <div className="container mt-3 mb-4">
             <form onSubmit={handleSubmit}>
                 <div className="row">
+
                     <div className="mb-3 col-lg-6 col-md-6 col-12">
                         <label htmlFor="meetTitle" className="form-label">
                             Meet Title
@@ -118,6 +128,20 @@ const CreateMeeting = () => {
                             value={data.meetEndingTime}
                             onChange={handleChange}
                         />
+                    </div>
+                    <div className="mb-3 col-lg-6 col-md-6 col-12">
+                        <label htmlFor="meetTitle" className="form-label">
+                            Meet Room No
+                        </label>
+                        <select className="form-select" aria-label="Default select example" id="meetingRoom" selected name="meetingRoom" onChange={handleChange} value={data.meetingRoom}>
+                            <option disabled >Meeting Room</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
                     </div>
                     <button type="submit" className="btn btn-primary mt-3">
                         Submit

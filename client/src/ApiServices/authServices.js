@@ -12,8 +12,10 @@ class AuthServices {
     return axios.post('/login', data);
   }
 
-  getEmployees(page) {
-    return axios.get(`/employees/?page=${page}`, {
+  getEmployees(page, data) {
+    const { designation, team, reporting, joiningDate } = data;
+    console.log(joiningDate);
+    return axios.get(`/employees/?page=${page}&sort=${joiningDate}&designation=${designation}&team=${team}&reporting=${reporting}`, {
       headers: {
         Authorization:
           "Bearer " +
@@ -123,6 +125,18 @@ class AuthServices {
     })
   }
 
+
+  abortMeeting(id) {
+    return axios.post(`/meetings/abort/${id}`, '', {
+      headers: {
+        Authorization:
+          "Bearer " +
+          getUserDetails.accessToken,
+      }
+    })
+  }
+
 }
+
 
 export default new AuthServices();

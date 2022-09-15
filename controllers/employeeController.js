@@ -24,11 +24,11 @@ const getEmployeeDetails = async (req, res) => {
 
     let employees = employee.find(queryObject).select('-password');
 
-    if (sort === 'latest') {
+    if (sort == false) {
         employees = employees.sort('-joiningDate');
     }
 
-    if (sort === 'oldest') {
+    if (sort == true) {
         employees = employees.sort('joiningDate');
     }
 
