@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginContext } from '../context/contextProvider';
+import { loginContext, addUserDataContext, addMeetDataContext, updateMeetDataContext, updateUserDataContext, deleteMeetDataContext, deleteUserDataContext } from '../context/contextProvider';
 import LoginIcon from '@mui/icons-material/Login';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import PeopleIcon from '@mui/icons-material/People';
@@ -10,6 +10,13 @@ import "./navbar.css";
 const Navbar = () => {
 
   const [loginData, setloginData] = useContext(loginContext);
+  const [userData, setuserData] = useContext(addUserDataContext);
+  const [meetData, setmeetData] = useContext(addMeetDataContext);
+  const [updateUserData, setupdateUserData] = useContext(updateUserDataContext);
+  const [updateMeetData, setupdateMeetData] = useContext(updateMeetDataContext);
+  const [deleteUserData, setdeleteUserData] = useContext(deleteUserDataContext);
+  const [deleteMeetData, setdeleteMeetData] = useContext(deleteMeetDataContext);
+
   const navigate = useNavigate('');
 
   return (
@@ -88,6 +95,12 @@ const Navbar = () => {
                       aria-current="page"
                       onClick={() => {
                         setloginData(null);
+                        setuserData(null);
+                        setmeetData(null);
+                        setupdateMeetData(null);
+                        setupdateUserData(null);
+                        setdeleteMeetData(null);
+                        setdeleteUserData(null);
                         localStorage.removeItem('userDetails');
                         navigate('/')
                       }}

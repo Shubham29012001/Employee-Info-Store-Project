@@ -24,6 +24,8 @@ h1 {
 
 .admin_input {
   display: flex;
+  border-radius: 10px;
+  text-align: center;
 }
 
 input[type] {
@@ -32,4 +34,9 @@ input[type] {
 
 label {
   font-weight: bold;
+}
+
+.admin_input > input[type] {
+  border-radius: 10px;
+  text-align: center;
 }

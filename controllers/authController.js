@@ -4,34 +4,39 @@ const { badRequestError, unauthenticateError, customAPIError } = require('../err
 const loginController = async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-
+    console.log(email, password)
     if (!email || !password) {
         throw new badRequestError('Please provide both username and password');
     }
 
     const user = await employee.findOne({ email });
-    const comparePass = await user.comparePassword(password);
 
-    if (comparePass) {
-        const accessToken = user.createJWT();
-        res.status(200).json({
-            name: user.name,
-            dob: user.dob,
-            email: user.email,
-            address: user.address,
-            designation: user.designation,
-            team: user.team,
-            seat: user.seat,
-            reportingTo: user.reportingTo,
-            preferenceEndTime: user.preferenceEndTime,
-            preferenceStartTime: user.preferenceStartTime,
-            userType: user.userType,
-            accessToken,
-            msg: "Login successfully"
-        });
+    if (user) {
+        const comparePass = await user.comparePassword(password);
+        if (comparePass) {
+            const accessToken = user.createJWT();
+            res.status(200).json({
+                name: user.name,
+                dob: user.dob,
+                email: user.email,
+                address: user.address,
+                designation: user.designation,
+                team: user.team,
+                seat: user.seat,
+                reportingTo: user.reportingTo,
+                preferenceEndTime: user.preferenceEndTime,
+                preferenceStartTime: user.preferenceStartTime,
+                userType: user.userType,
+                accessToken,
+                msg: "Login successfully"
+            });
+        }
+        else {
+            throw new unauthenticateError('Please provide correct credentials')
+        }
     }
     else {
-        throw new unauthenticateError('Please provide correct credentials')
+        throw new unauthenticateError('User not found')
     }
 }
 

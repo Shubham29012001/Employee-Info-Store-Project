@@ -3,7 +3,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import "./styles.css"
 // Importing All Material UI Icons
-
+import Swal from 'sweetalert2'
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
@@ -58,10 +58,28 @@ const Detail = () => {
 
   const deleteEmployeeData = async (id) => {
     try {
-      const { data: res } = await AuthServices.deleteEmployee(id);
-      if (res) {
-        toast.success('Employee Deleted Successfully');
-        history("/admin");
+      const swalFire = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      })
+
+      if (swalFire.isConfirmed) {
+
+        const { data: res } = await AuthServices.deleteEmployee(id);
+        if (res) {
+          toast.success('Employee Deleted Successfully');
+          history("/admin");
+          Swal.fire(
+            'Deleted!',
+            'Employee has been deleted.',
+            'success'
+          )
+        }
       }
     }
     catch (error) {
@@ -83,7 +101,9 @@ const Detail = () => {
           direction="column"
           alignItems="center"
           justify="center"
-          style={{ minHeight: "100vh" }}
+          style={{
+            minHeight: "100vh", boxShadow: "0px 3px 3px - 2px rgb(0 0 0 / 20 %), 0px 3px 4px 0px rgb(0 0 0 / 14 %), 0px 1px 8px 0px rgb(0 0 0 / 12%)"
+          }}
         >
           <Grid item xs={3}>
             <Card sx={{ minWidth: 275, maxWidth: 700 }}>
@@ -151,7 +171,7 @@ const Detail = () => {
             </Card>
           </Grid>
         </Grid>
-      </div>
+      </div >
 
     );
   } else {

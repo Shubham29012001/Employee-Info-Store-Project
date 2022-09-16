@@ -7,6 +7,7 @@ import { updateUserDataContext } from "../context/contextProvider.js";
 import AuthServices from "../../ApiServices/authServices.js";
 import Zoom from 'react-reveal/Zoom';
 import { toast } from 'react-toastify';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const Edit = () => {
   const history = useNavigate("");
@@ -51,29 +52,23 @@ const Edit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!data.name || !data.address || !data.designation || !data.dob || !data.email || !data.joiningDate || !data.preferenceEndTime || !data.preferenceStartTime || !data.reportingTo || !data.team || !data.seat) {
-      toast.error("Please provide complete input details");
-    }
-    else {
-      try {
-        const { data: res } = await AuthServices.updateEmployee(id, data);
-        if (res) {
-          toast.success('Employee Updated Successfully');
-          setupdateUserData(res);
-          history("/admin");
-        }
-      }
-      catch (error) {
-        toast.error(error.response.data.msg);
+    try {
+      const { data: res } = await AuthServices.updateEmployee(id, data);
+      if (res) {
+        toast.success('Employee Updated Successfully');
+        setupdateUserData(res);
+        history("/admin");
       }
     }
-  };
+    catch (error) {
+      toast.error(error.response.data.msg);
+    }
+  }
 
   return (
     <Zoom duration={500}>
       <div className="container mt-3 mb-4">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="mt-4">
           <div className="row">
             <div className="mb-3 col-lg-6 col-md-6 col-12">
               <label htmlFor="name" className="form-label">

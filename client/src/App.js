@@ -24,7 +24,6 @@ import CreateMeeting from './components/createmeeting/createmeeting.js';
 
 function App() {
   const [loginData, setloginData] = useContext(loginContext);
-  const userType = loginData.userType;
   return (
     <>
       <Navbar />
@@ -32,7 +31,7 @@ function App() {
         <Route path="/" exact element={<Home />} />
         <Route path="/login" exact element={<Login />} />
         <Route path="/signup" exact element={<Signup />} />
-        {userType === 755 ? (
+        {loginData && loginData.userType === 755 ? (
           <>
             <Route path="/admin" exact element={<Admin />} />
             <Route path="/meetings" exact element={<Meeting />} />
@@ -43,7 +42,7 @@ function App() {
           </>
         ) : (
           <>
-            {userType === 255 ? (
+            {loginData && loginData.userType === 255 ? (
               <>
                 <Route path="/dashboard" exact element={<Dashboard />} />
                 <Route path="/meetings/create" exact element={<CreateMeeting />} />
@@ -55,6 +54,7 @@ function App() {
               )}
           </>
         )}
+        <Route path="/*" exact element={<Navigate replace to="/" />} />
       </Routes>
       <ToastContainer autoClose={2000} limit={3} />
     </>
