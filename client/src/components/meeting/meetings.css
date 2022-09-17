@@ -10,18 +10,21 @@
   color: white !important;
   margin-bottom: 1rem;
 }
-
 .pagination {
-  margin-top: 40px;
+  position: fixed;
+  bottom: 25px;
+  left: 43% !important;
 }
 
 .pagination button {
   color: black;
-  padding: 10px;
+  padding: 3px !important;
+  margin: 10px;
+  width: 40px;
 }
 
 .pagination span {
-  font-size: 10px;
+  font-size: 15px !important;
 }
 
 h1 {

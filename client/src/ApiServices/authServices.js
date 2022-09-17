@@ -14,7 +14,6 @@ class AuthServices {
 
   getEmployees(page, data) {
     const { designation, team, reporting, joiningDate } = data;
-    console.log(joiningDate);
     return axios.get(`/employees/?page=${page}&sort=${joiningDate}&designation=${designation}&team=${team}&reporting=${reporting}`, {
       headers: {
         Authorization:

@@ -83,11 +83,6 @@ const Meeting = () => {
 
                 const { data: res } = await AuthServices.deleteMeeting(id);
                 if (res) {
-                    Swal.fire(
-                        'Deleted!',
-                        'Meeting has been deleted.',
-                        'success'
-                    )
                     toast.success("Meeting Deleted Successfully");
                     getMeetingsData();
                     setdeleteMeetData(deleteMeetData);
@@ -133,7 +128,7 @@ const Meeting = () => {
 
     return (
         <>
-            <div className="mt-5">
+            <div className="mt-3">
                 <div className="container">
                     {loading === false ? <> {loginData.userType === 755 && <Loader />} </> : <> <h1> <GroupsIcon /> Meetings</h1>
                         <div className="add-btn mt-2">
@@ -141,7 +136,7 @@ const Meeting = () => {
                                 Create Meetings
                             </NavLink>
                         </div>
-                        <table className="table mt-5">
+                        <table className="table mt-5 table-striped table-hover table-bordered">
                             <thead>
                                 <tr className="table-dark">
                                     <th scope="col">ID</th>
@@ -168,26 +163,16 @@ const Meeting = () => {
                                                 )
                                             })}</td>
                                             <td>{new Date(element.meetStartingTime).toLocaleString('en-GB', { timeZone: 'UTC' }) + " - " + new Date(element.meetEndingTime).toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
-                                            <td className="d-flex justify-content-between">
-                                                <button
-                                                    className="btn btn-dark"
-                                                    onClick={() => abortMeeting(element._id)}
-                                                >
-                                                    <CancelIcon />
-                                                </button>
-                                                {(loginData.userType === 755 || loginData.email === element.meetCreatedBy) &&
+                                            <td className="d-flex justify-content-between height-100">
+                                                <CancelIcon className="logo abort" onClick={() => abortMeeting(element._id)} />
+                                                {
+                                                    (loginData.userType === 755 || loginData.email === element.meetCreatedBy) &&
                                                     <>
                                                         <NavLink to={`/meetings/edit/${element._id}`}>
-                                                            <button className="btn btn-primary">
-                                                                <EditIcon />
-                                                            </button>
+                                                            <EditIcon className="logo edit" />
                                                         </NavLink>
-                                                        <button
-                                                            className="btn btn-danger"
-                                                            onClick={() => deleteMeetingData(element._id)}
-                                                        >
-                                                            <DeleteIcon />
-                                                        </button>
+
+                                                        <DeleteIcon className="logo delete" onClick={() => deleteMeetingData(element._id)} />
                                                     </>
                                                 }
                                             </td>
@@ -196,10 +181,9 @@ const Meeting = () => {
                                 }) : <td colSpan="7" style={{ textAlign: "center" }}>No Meetings</td>}
                             </tbody>
                         </table>
-
                         {loginData.userType === 755 && <ul className="pagination justify-content-center">
                             <li className="page-item">
-                                <button className="page-link" onClick={() => {
+                                <button className="page-link paginate" onClick={() => {
                                     setPageNumber(Math.max(0, pageNumber - 1));
                                 }} aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
@@ -214,7 +198,7 @@ const Meeting = () => {
                                 )
                             })}
                             <li className="page-item">
-                                <button className="page-link" onClick={() => {
+                                <button className="page-link paginate" onClick={() => {
                                     setPageNumber(Math.min(numberOfPages, pageNumber + 1))
                                 }}
                                     aria-label="Next">
@@ -226,7 +210,7 @@ const Meeting = () => {
                     </>}
 
                 </div>
-            </div>
+            </div >
         </>
     );
 };

@@ -1,6 +1,6 @@
 .signup_container {
   width: 100%;
-  min-height: 100vh;
+  min-height: 92vh;
   background-color: #f5f5f5;
   display: flex;
   align-items: center;
@@ -9,7 +9,7 @@
 
 .signup_form_container {
   width: 900px;
-  height: 500px;
+  height: 550px;
   display: flex;
   border-radius: 10px;
   box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%),

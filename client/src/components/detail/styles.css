@@ -1,6 +1,6 @@
 h1 {
   text-align: center;
-  margin-bottom: 2rem;
+  margin: 2rem 0 !important;
 }
 
 h3 {
@@ -17,4 +17,26 @@ span {
 
 .btn {
   float: right;
+  border-radius: 20px !important;
+}
+
+.logo {
+  font-size: 25px !important;
+}
+
+.delete {
+  color: red;
+  cursor: pointer;
+}
+
+.edit {
+  color: black;
+}
+
+.abort {
+  color: #0d6efd;
+}
+
+tr {
+  padding: 10px !important;
 }

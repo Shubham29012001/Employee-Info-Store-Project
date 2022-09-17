@@ -22,6 +22,7 @@ import _ from 'lodash';
 const Admin = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [getEmployees, setEmployees] = useState([]);
+
   const [numberOfPages, setNumberOfPages] = useState(0);
   const [loading, setLoading] = useState(false);
   // Using Context Values
@@ -38,7 +39,7 @@ const Admin = () => {
     joiningDate: false
   });
 
-  const getEmployeesData = async (e) => {
+  const getEmployeesData = _.debounce(async (e) => {
     try {
       if (loginData.userType === 755) {
         const { data: res } = await AuthServices.getEmployees(pageNumber, data);
@@ -59,23 +60,20 @@ const Admin = () => {
       console.log(error.response.data.msg);
       setloginData(null)
     }
-  }
+  }, 500
+  )
 
   const handleChange = ({ currentTarget }) => {
     setData({ ...data, [currentTarget.name]: currentTarget.value });
-    getEmployeesData()
+
   };
 
   const checkboxChange = ({ currentTarget: input }) => {
     setData({ ...data, [input.name]: !input.value.checked });
   };
 
-  const delay = _.debounce(() => {
-    getEmployeesData();
-  }, 500);
-
   useEffect(() => {
-    delay();
+    getEmployeesData();
   }, [pageNumber, data]);  // // Delete Users in Backend
 
   const deleteEmployeeData = async (id) => {
@@ -93,11 +91,6 @@ const Admin = () => {
       if (swalFire.isConfirmed) {
         const { data: res } = await AuthServices.deleteEmployee(id);
         if (res) {
-          Swal.fire(
-            'Deleted!',
-            'Employee has been deleted.',
-            'success'
-          )
           getEmployeesData();
           setdeleteUserData(deleteUserData);
           toast.success("Employee Deleted Succesfully")
@@ -113,7 +106,7 @@ const Admin = () => {
   return (
     <>
 
-      <div className="mt-5">
+      <div className="mt-3">
         <div className="container">
           {loading === false ? (<Loader />) : (
             <>
@@ -150,57 +143,49 @@ const Admin = () => {
                   </div>
                 </form>
               }
-              <table className="table mt-5">
-                <thead>
-                  <tr className="table-dark">
-                    <th scope="col">ID</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Designation</th>
-                    <th scope="col">Reporting To</th>
-                    <th scope="col">Team</th>
-                    <th scope="col">Joining Date</th>
-                    {loginData.userType === 755 && <th scope="col">Actions</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {getEmployees && getEmployees.length > 0 ? getEmployees.map((element, id) => {
-                    return (
-                      <tr key={id + 1}>
-                        <th scope="row">{id + 1}</th>
-                        <td>{element.name}</td>
-                        <td>{element.email}</td>
-                        <td>{element.designation}</td>
-                        <td>{element.reportingTo}</td>
-                        <td>{element.team}</td>
-                        <td>{new Date(element.joiningDate).toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
-                        {loginData.userType === 755 && <td className="d-flex justify-content-between">
-                          <NavLink to={`/view/${element._id}`}>
-                            {' '}
-                            <button className="btn btn-success">
-                              <RemoveRedEyeIcon />
-                            </button>
-                          </NavLink>
-                          <NavLink to={`/admin/edit/${element._id}`}>
-                            <button className="btn btn-primary">
-                              <EditIcon />
-                            </button>
-                          </NavLink>
-                          {loginData.userType !== 755}
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => deleteEmployeeData(element._id)}
-                          >
-                            <DeleteIcon />
-                          </button>
-                        </td>}
+              <div class="table-responsive">
+                <table className="table mt-5 table-striped table-hover table-bordered admin-table">
+                  <thead>
+                    <tr className="table-dark">
+                      <th scope="col">ID</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Email</th>
+                      <th scope="col">Designation</th>
+                      <th scope="col">Reporting To</th>
+                      <th scope="col">Team</th>
+                      <th scope="col">Joining Date</th>
+                      {loginData.userType === 755 && <th scope="col">Actions</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getEmployees && getEmployees.length > 0 ? getEmployees.map((element, id) => {
+                      return (
+                        <tr key={id + 1}>
+                          <th scope="row">{id + 1}</th>
+                          <td>{element.name}</td>
+                          <td>{element.email}</td>
+                          <td>{element.designation}</td>
+                          <td>{element.reportingTo}</td>
+                          <td>{element.team}</td>
+                          <td>{new Date(element.joiningDate).toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
+                          {loginData.userType === 755 && <td className="d-flex justify-content-between">
+                            <NavLink to={`/view/${element._id}`}>
+                              {' '}
+                              <RemoveRedEyeIcon className="logo abort" />
+                            </NavLink>
+                            <NavLink to={`/admin/edit/${element._id}`}>
+                              <EditIcon className="logo edit " />
+                            </NavLink>
+                            {loginData.userType !== 755}
+                            <DeleteIcon className="logo delete" onClick={() => deleteEmployeeData(element._id)} />
+                          </td>}
 
-                      </tr>
-                    );
-                  }) : <tr><td colspan="8" style={{ textAlign: "center" }}>No Employees</td></tr>}
-                </tbody>
-              </table>
-
+                        </tr>
+                      );
+                    }) : <td colSpan="8" style={{ textAlign: "center" }}>No Employees</td>}
+                  </tbody>
+                </table>
+              </div>
               {loginData.userType === 755 && <ul className="pagination justify-content-center">
                 <li className="page-item">
                   <button className="page-link" onClick={() => {
