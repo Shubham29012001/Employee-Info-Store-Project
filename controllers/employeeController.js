@@ -4,22 +4,22 @@ const { badRequestError, customAPIError } = require('../errors/')
 const getEmployeeDetails = async (req, res) => {
     const { sort, team, designation, reporting } = req.query;
 
-    let limit = parseInt(req.query.limit) || 10;
+    let limit = parseInt(req.query.limit) || 7;
     let page = parseInt(req.query.page) || 1;
     let skip = (page - 1) * limit;
 
     let queryObject = {};
 
     if (team && team !== 'all') {
-        queryObject.team = team;
+        queryObject.team = new RegExp(team, 'i');
     }
 
     if (designation && designation !== 'all') {
-        queryObject.designation = designation;
+        queryObject.designation = new RegExp(designation, 'i');
     }
 
     if (reporting) {
-        queryObject.reportingTo = reporting;
+        queryObject.reportingTo = new RegExp(reporting, 'i');
     }
 
     let employees = employee.find(queryObject).select('-password');

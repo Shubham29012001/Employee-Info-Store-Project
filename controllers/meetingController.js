@@ -13,7 +13,7 @@ const getAllMeetingDetails = async (req, res) => {
         queryObject.particularValue = req.body.particularValue;
     }
 
-    let limit = parseInt(req.query.limit) || 10;
+    let limit = parseInt(req.query.limit) || 5;
     let page = parseInt(req.query.page) || 1;
     let skip = (page - 1) * limit;
     const allMeetings = await meeting.find(queryObject).skip(skip).limit(limit);
@@ -88,7 +88,7 @@ const createMeetingDetails = async (req, res) => {
                     memberName.push(memberResult.name);
                 }
                 else {
-                    throw new badRequestError("Employee not found");
+                    throw new badRequestError(`${meetMembers[i]} Employee not found`);
                 }
                 const isMemberConflict = await meeting.findOne({ meetMembers: meetMembers[i], meetStartingTime, meetEndingTime });
 

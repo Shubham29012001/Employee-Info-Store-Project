@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-
+const compression = require('compression');
 require('dotenv').config();
 require('express-async-errors');
 
@@ -23,6 +23,17 @@ const pageNotFoundRoute = require('./routes/pageNotFoundRoute');
 
 const errorHandlerMiddleware = require('./middleware/errorHandlerMiddleware');
 
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "OPTIONS,GET,POST,PUT,PATCH,DELETE"
+    );
+    res.setHeader("Access-Control-Allow-Headers", "*");
+    next();
+});
+
+
 app.use(rateLimiter(
     {
         windowMs: 20 * 60 * 1000,
@@ -33,6 +44,18 @@ app.use(express.json());
 app.use(helmet());
 app.use(xss());
 app.use(cors());
+
+app.use(
+    compression(
+        (level = 6),
+        (filter = (req, res) => {
+            if (req.headers["no-x-compression"]) {
+                return false;
+            }
+            return compression.filter(req, res);
+        })
+    )
+);
 
 app.use('/api/v1/', authRoute);
 app.use('/api/v1/employees/', authenticate, employeeRoute);
