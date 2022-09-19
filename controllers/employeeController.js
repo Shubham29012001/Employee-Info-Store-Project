@@ -24,17 +24,8 @@ const getEmployeeDetails = async (req, res) => {
 
     let employees = employee.find(queryObject).select('-password');
 
-    if (sort == false) {
-        employees = employees.sort('-joiningDate');
-    }
-
-    if (sort == true) {
-        employees = employees.sort('joiningDate');
-    }
-
     employees = employees.skip(skip).limit(limit);
-
-    const completeEmployee = await employees.select('-password').select('-userType');
+    const completeEmployee = await employees.sort({ 'joiningDate': sort }).select('-password').select('-userType');
 
     const totalEmployees = await employee.countDocuments(queryObject);
     const numberOfPages = Math.ceil(totalEmployees / limit);

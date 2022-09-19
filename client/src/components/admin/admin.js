@@ -68,8 +68,9 @@ const Admin = () => {
 
   };
 
-  const checkboxChange = ({ currentTarget: input }) => {
-    setData({ ...data, [input.name]: !input.value.checked });
+  const checkboxChange = ({ currentTarget }) => {
+    setData({ ...data, [currentTarget.name]: !currentTarget.checked });
+    console.log(data)
   };
 
   useEffect(() => {
@@ -137,7 +138,7 @@ const Admin = () => {
                     </div>
                     <div className="admin_input">
                       <label htmlFor="joiningDate">Sort: </label>
-                      <input type="checkbox" value={data.joiningDate} onChange={checkboxChange}
+                      <input type="checkbox" defaultChecked={data.joiningDate} onChange={checkboxChange}
                         name="joiningDate" />
                     </div>
                   </div>
@@ -189,7 +190,8 @@ const Admin = () => {
               {loginData.userType === 755 && <ul className="pagination justify-content-center">
                 <li className="page-item">
                   <button className="page-link" onClick={() => {
-                    setPageNumber(Math.max(0, pageNumber - 1));
+                    setPageNumber(Math.max(0, pageNumber - 1),
+                    );
                   }} aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                     <span className="sr-only"></span>
@@ -198,7 +200,10 @@ const Admin = () => {
                 {pages.map((pageIndex) => {
                   return (
                     <li className="page-item" key={pageIndex}>
-                      <button className="page-link" onClick={() => { setPageNumber(pageIndex + 1) }}>{pageIndex + 1}</button>
+                      <button className="page-link" onClick={() => {
+                        setLoading(false);
+                        setPageNumber(pageIndex + 1)
+                      }}>{pageIndex + 1}</button>
                     </li>
                   )
                 })}
