@@ -11,6 +11,9 @@ import HomeIcon from "@mui/icons-material/Home";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import BadgeIcon from "@mui/icons-material/Badge";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import EventSeatIcon from '@mui/icons-material/EventSeat';
+import GroupWorkIcon from '@mui/icons-material/GroupWork';
 
 import { useParams, NavLink, useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
@@ -134,7 +137,7 @@ const Detail = () => {
                       <span>{getUserData.email}</span>
                     </h3>
                     <h3>
-                      <MailOutlineIcon /> Date Of Birth:{" "}
+                      <DateRangeIcon /> Date Of Birth:{" "}
                       <span>{getUserData.dob}</span>
                     </h3>
                     <h3>
@@ -150,15 +153,15 @@ const Detail = () => {
                       <span>{getUserData.reportingTo}</span>
                     </h3>
                     <h3>
-                      <CreditCardIcon /> Team:{" "}
+                      <GroupWorkIcon /> Team:{" "}
                       <span>{getUserData.team}</span>
                     </h3>
                     <h3>
-                      <CreditCardIcon /> Seat No:{" "}
+                      <EventSeatIcon /> Seat No:{" "}
                       <span>{getUserData.seat}</span>
                     </h3>
                     <h3>
-                      <CreditCardIcon /> Joining Date:{" "}
+                      <DateRangeIcon /> Joining Date:{" "}
                       <span>{getUserData.joiningDate}</span>
                     </h3>
                     <h3>
