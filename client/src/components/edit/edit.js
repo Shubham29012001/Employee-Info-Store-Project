@@ -7,7 +7,8 @@ import { updateUserDataContext } from "../context/contextProvider.js";
 import AuthServices from "../../ApiServices/authServices.js";
 import Zoom from 'react-reveal/Zoom';
 import { toast } from 'react-toastify';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+
 
 const Edit = () => {
   const history = useNavigate("");
@@ -226,9 +227,15 @@ const Edit = () => {
                 onChange={handleChange}
               />
             </div>
-            <button type="submit" className="btn btn-primary mt-3">
-              Submit
-            </button>
+            <div className="mb-3 d-flex justify-content-center">
+
+              <KeyboardBackspaceIcon className="col-lg-3 col-md-3 col-12 m-4" style={{ fontSize: "40px", cursor: "pointer" }} onClick={() => {
+                history('/admin');
+              }} />
+              <button type="submit" className="btn btn-primary col-lg-2 col-md-3 col-12 m-4" style={{ backgroundColor: "#25316d" }}>
+                Submit
+              </button>
+            </div>
           </div>
         </form>
       </div>

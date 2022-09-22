@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 // Importing updateContext Provider
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 import { updateMeetDataContext, loginContext } from "../context/contextProvider.js";
 import AuthServices from "../../ApiServices/authServices.js";
@@ -35,7 +36,7 @@ const EditMeeting = () => {
             if (res) {
                 res.individualMeetDetails.meetStartingTime = res.individualMeetDetails.meetStartingTime.split('.')[0]
                 res.individualMeetDetails.meetEndingTime = res.individualMeetDetails.meetEndingTime.split('.')[0];
-
+                console.log(res.individualMeetDetails.meetEndingTime);
                 setData(res.individualMeetDetails);
             }
         }
@@ -166,9 +167,14 @@ const EditMeeting = () => {
                                 <option value="6">6</option>
                             </select>
                         </div>
-                        <button type="submit" className="btn btn-primary mt-3">
-                            Submit
-                        </button>
+                        <div className="mb-3 d-flex justify-content-center">
+                            <KeyboardBackspaceIcon className="col-lg-3 col-md-3 col-12 m-4" style={{ fontSize: "40px", cursor: "pointer" }} onClick={() => {
+                                history('/meetings');
+                            }} />
+                            <button type="submit" className="btn btn-primary col-lg-2 col-md-3 col-12 m-4" style={{ backgroundColor: "#25316d" }}>
+                                Submit
+                            </button>
+                        </div>
                     </div>
                 </form >
             </div >

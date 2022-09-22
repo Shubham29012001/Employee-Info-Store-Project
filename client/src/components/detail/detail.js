@@ -2,7 +2,9 @@ import { React, useEffect, useState, useContext } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import "./styles.css"
+
 // Importing All Material UI Icons
+
 import Swal from 'sweetalert2'
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -12,9 +14,9 @@ import CreditCardIcon from "@mui/icons-material/CreditCard";
 import BadgeIcon from "@mui/icons-material/Badge";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import DateRangeIcon from '@mui/icons-material/DateRange';
-import EventSeatIcon from '@mui/icons-material/EventSeat';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
-
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { Tooltip, IconButton } from "@mui/material";
 import { useParams, NavLink, useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 
@@ -66,8 +68,9 @@ const Detail = () => {
         text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
         confirmButtonText: 'Yes, delete it!'
       })
 
@@ -96,7 +99,9 @@ const Detail = () => {
     return (
       <div className="container mt-3">
         <h1 style={{ fontWeight: 400, textAlign: "center" }}>
-          Welcome {JSON.parse(localStorage.getItem("userDetails")).name}
+          <KeyboardBackspaceIcon style={{ fontSize: "40px", cursor: "pointer" }} onClick={() => {
+            history('/admin');
+          }} /> Welcome {JSON.parse(localStorage.getItem("userDetails")).name}
         </h1>
         <Grid
           container
@@ -109,63 +114,65 @@ const Detail = () => {
           }}
         >
           <Grid item xs={3}>
-            <Card sx={{ minWidth: 275, maxWidth: 700 }}>
+            <Card className="card" sx={{ minWidth: 275, maxWidth: 700, borderRadius: "25px" }}>
               <CardContent>
                 <div className="row">
                   <div className="right_view col-12 col-lg-12 col-md-12">
                     {loginData.userType === 755 && (
                       <div className="add_btn">
-                        <NavLink to={`/admin/edit/${getUserData._id}`}>
-                          <button className="btn btn-primary mx-2">
-                            <EditIcon />
-                          </button>
-                        </NavLink>
-                        <button
-                          className="btn btn-danger mx-2"
-                          onClick={() => deleteEmployeeData(getUserData._id)}
-                        >
-                          <DeleteIcon />
-                        </button>
+                        <Tooltip title="Edit Employee">
+                          <IconButton className=" editdetail logodetail">
+                            <NavLink to={`/admin/edit/${getUserData._id}`}>
+                              <EditIcon className="editdetail " />
+                            </NavLink>
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete Employee">
+                          <IconButton className=" deletedetail logodetail">
+                            <DeleteIcon className="deletedetail " onClick={() => deleteEmployeeData(getUserData._id)}
+                            />
+                          </IconButton>
+                        </Tooltip>
                       </div>
                     )}
                     <h3>
-                      <BadgeIcon /> Full Name:{" "}
+                      <BadgeIcon className="inner" /> Full Name:{" "}
                       <span>{getUserData.name}</span>
                     </h3>
                     <h3>
-                      <MailOutlineIcon /> Email:{" "}
+                      <MailOutlineIcon className="inner" /> Email:{" "}
                       <span>{getUserData.email}</span>
                     </h3>
                     <h3>
-                      <DateRangeIcon /> Date Of Birth:{" "}
+                      <DateRangeIcon className="inner" /> Date Of Birth:{" "}
                       <span>{getUserData.dob}</span>
                     </h3>
                     <h3>
-                      <HomeIcon /> Home Address:{" "}
+                      <HomeIcon className="inner" /> Home Address:{" "}
                       <span>{getUserData.address}</span>
                     </h3>
                     <h3>
-                      <PhoneIphoneIcon /> Designation:{" "}
+                      <PhoneIphoneIcon className="inner" /> Designation:{" "}
                       <span>{getUserData.designation}</span>
                     </h3>
                     <h3>
-                      <CreditCardIcon /> Reporting To:{" "}
+                      <CreditCardIcon className="inner" /> Reporting To:{" "}
                       <span>{getUserData.reportingTo}</span>
                     </h3>
                     <h3>
-                      <GroupWorkIcon /> Team:{" "}
+                      <GroupWorkIcon className="inner" /> Team:{" "}
                       <span>{getUserData.team}</span>
                     </h3>
                     <h3>
-                      <EventSeatIcon /> Seat No:{" "}
+                      <MailOutlineIcon className="inner" /> Seat No:{" "}
                       <span>{getUserData.seat}</span>
                     </h3>
                     <h3>
-                      <DateRangeIcon /> Joining Date:{" "}
-                      <span>{getUserData.joiningDate}</span>
+                      <DateRangeIcon className="inner" /> Joining Date:{" "}
+                      <span>{new Date(getUserData.joiningDate).toLocaleString('en-GB', { timeZone: 'UTC' })}</span>
                     </h3>
                     <h3>
-                      <CreditCardIcon /> Preference Time:{" "}
+                      <CreditCardIcon className="inner" /> Preference Time:{" "}
                       <span>{getUserData.preferenceStartTime + " - " + getUserData.preferenceEndTime}</span>
                     </h3>
                   </div>

@@ -21,9 +21,9 @@ const Navbar = () => {
 
   return (
     <header>
-      <nav className="navbar navbar-expand-lg sticky-top navbar-dark bg-primary">
+      <nav className="navbar navbar-expand-lg sticky-top navbar-dark">
         <div className="container-fluid">
-          <div className="navbar-items">
+          <div className="navbar-items ">
             <Link className="navbar-brand" to="/">
               Employee Info Store
             </Link>
@@ -88,7 +88,32 @@ const Navbar = () => {
                   </>
 
                 }
+                {loginData && loginData.userType === 255 &&
+                  <>
+                    <li className="nav-item">
+                      <Link
+                        className="nav-link "
+                        aria-current="page"
+                        to="/employee"
+                      >
+                        <PeopleIcon /> Employees
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link
+                        className="nav-link "
+                        aria-current="page"
+                        to="/meetings"
+                      >
+                        <MeetingRoomIcon /> Meetings
+                      </Link>
+                    </li>
+                  </>
+
+                }
+
                 {loginData && loginData.userType &&
+
                   <li className="nav-item">
                     <button
                       className="nav-link logout"
@@ -107,8 +132,7 @@ const Navbar = () => {
                     >
                       Logout
                     </button>
-                  </li>
-                }
+                  </li>}
               </ul>
             </div>
           </div>

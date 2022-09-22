@@ -1,7 +1,7 @@
 .logout {
   outline: none;
   border: 0;
-  background-color: #0d6efd;
+  background-color: #0f3460;
   border-radius: 15px;
 }
 
@@ -32,4 +32,8 @@
 
 a {
   color: white !important;
+}
+
+.navbar {
+  background-color: #25316d;
 }

@@ -15,11 +15,6 @@ span {
   font-weight: normal;
 }
 
-.btn {
-  float: right;
-  border-radius: 20px !important;
-}
-
 .logo {
   font-size: 25px !important;
 }
@@ -27,16 +22,46 @@ span {
 .delete {
   color: red;
   cursor: pointer;
+  float: right;
 }
 
 .edit {
-  color: black;
+  float: right;
+  color: #31087b;
 }
 
 .abort {
+  color: #5f6f94;
+  cursor: pointer;
+}
+
+.logodetail {
+  font-size: 30px !important;
+  margin: 2px;
+}
+
+.deletedetail {
+  color: red;
+  cursor: pointer;
+  float: right;
+}
+
+.editdetail {
+  float: right;
+  color: black;
+}
+
+.abortdetail {
   color: #0d6efd;
+  cursor: pointer;
 }
 
 tr {
   padding: 10px !important;
+}
+
+.inner {
+  margin-right: 10px;
+  margin-bottom: 5px;
+  font-size: 25px !important;
 }
