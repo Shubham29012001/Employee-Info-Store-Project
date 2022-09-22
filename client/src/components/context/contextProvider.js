@@ -15,7 +15,7 @@ const ContextProvider = ({ children }) => {
   const [updateMeetData, setupdateMeetData] = useState('');
   const [deleteUserData, setdeleteUserData] = useState('');
   const [deleteMeetData, setdeleteMeetData] = useState('');
-  const [loginData, setloginData] = useState('');
+  const [loginData, setloginData] = useState(localStorage.getItem('userDetails') ? JSON.parse(localStorage.getItem('userDetails')) : '');
 
   return (
     <loginContext.Provider value={[loginData, setloginData]} >

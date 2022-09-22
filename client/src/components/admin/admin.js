@@ -6,6 +6,9 @@ import Loader from '../loader/loader';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Tooltip, IconButton } from '@mui/material';
+import GridTable from "@nadavshaar/react-grid-table";
+
 import {
   addUserDataContext,
   updateUserDataContext,
@@ -17,41 +20,169 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import { toast } from 'react-toastify';
 
 import AuthServices from '../../ApiServices/authServices.js';
-import _ from 'lodash';
 
 const Admin = () => {
-  const [pageNumber, setPageNumber] = useState(1);
-  const [getEmployees, setEmployees] = useState([]);
-
-  const [numberOfPages, setNumberOfPages] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [row, setRow] = useState([]);
   // Using Context Values
 
   // const [userData, setuserData] = useContext(addUserDataContext);
   // const [updateUserData, setupdateUserData] = useContext(updateUserDataContext);
   const [deleteUserData, setdeleteUserData] = useContext(deleteUserDataContext);
   const [loginData, setloginData] = useContext(loginContext);
-  const pages = new Array(numberOfPages).fill(null).map((v, i) => i);
-  const [data, setData] = useState({
-    designation: "",
-    team: "",
-    reporting: "",
-    joiningDate: false
-  });
 
-  const getEmployeesData = _.debounce(async (e) => {
+  const columns = loginData.userType === 755 ? [
+    {
+      id: 1,
+      field: "id",
+      label: "ID",
+      cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+        return (
+          <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} > <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} > {rowIndex}</div ></div >
+        )
+      },
+      width: "60px"
+    },
+    {
+      id: 2,
+      field: "name",
+      label: "Name"
+    },
+    {
+      id: 3,
+      field: "email",
+      label: "Email",
+      maxWidth: "100%"
+    },
+    {
+      id: 4,
+      field: "designation",
+      label: "Designation ",
+    },
+    {
+      id: 5,
+      field: "reportingTo",
+      label: "Reporting To ",
+
+    },
+    {
+      id: 6,
+      field: "joiningDate",
+      label: "Joining Date ",
+      cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+        return (
+          <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
+            <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
+              {new Date(value).toLocaleString('en-GB', { timeZone: 'IST' })}
+            </div>
+          </div>
+        )
+      }
+    },
+    {
+      id: 7,
+      field: "actions",
+      label: "Actions",
+      cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+        return (
+          <>
+            <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
+              <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
+                <NavLink to={`/view/${data._id}`}>
+                  {' '}
+                  <Tooltip title="View Employee">
+                    <IconButton>
+                      <RemoveRedEyeIcon className="logo abort" />
+                    </IconButton>
+                  </Tooltip>
+                </NavLink>
+                <Tooltip title="Edit Employee">
+                  <IconButton>
+                    <NavLink to={`/admin/edit/${data._id}`}>
+                      <EditIcon className="logo edit " />
+                    </NavLink>
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete Employee">
+                  <IconButton onClick={() => deleteEmployeeData(data._id)} >
+                    <DeleteIcon className="logo delete" />
+                  </IconButton>
+                </Tooltip>
+              </div >
+            </div >
+
+          </>
+
+        )
+      }
+    },
+  ] : [
+    {
+      id: 1,
+      field: "id",
+      label: "ID",
+      cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+        return (
+          <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} > <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} > {rowIndex}</div ></div >
+        )
+      },
+      width: "60px"
+    },
+    {
+      id: 2,
+      field: "name",
+      label: "Name"
+    },
+    {
+      id: 3,
+      field: "email",
+      label: "Email",
+      maxWidth: "100%"
+    },
+    {
+      id: 4,
+      field: "designation",
+      label: "Designation ",
+    },
+    {
+      id: 5,
+      field: "reportingTo",
+      label: "Reporting To ",
+    },
+    {
+      id: 6,
+      field: "team",
+      label: "Team",
+    },
+    {
+      id: 7,
+      field: "joiningDate",
+      label: "Joining Date ",
+      cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+        return (
+          <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
+            <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
+              {new Date(value).toLocaleString('en-GB', { timeZone: 'IST' })}
+            </div>
+          </div>
+        )
+      }
+    },
+  ];
+
+
+  const getEmployeesData = async () => {
     try {
       if (loginData.userType === 755) {
-        const { data: res } = await AuthServices.getEmployees(pageNumber, data);
+        const { data: res } = await AuthServices.getEmployees();
         if (res) {
-          setEmployees(res.completeEmployee);
-          setNumberOfPages(res.numberOfPages)
+          setRow(res.completeEmployee);
         }
       }
       else {
         const { data: res } = await AuthServices.getEmployeesByTeam(loginData.email);
         if (res) {
-          setEmployees(res.teamEmployee);
+          setRow(res.teamEmployee);
         }
       }
       setLoading(true)
@@ -59,23 +190,14 @@ const Admin = () => {
     catch (error) {
       console.log(error.response.data.msg);
       setloginData(null)
+      setLoading(false)
+      setRow([])
     }
-  }, 500
-  )
-
-  const handleChange = ({ currentTarget }) => {
-    setData({ ...data, [currentTarget.name]: currentTarget.value });
-
-  };
-
-  const checkboxChange = ({ currentTarget }) => {
-    setData({ ...data, [currentTarget.name]: !currentTarget.checked });
-    console.log(data)
-  };
+  }
 
   useEffect(() => {
     getEmployeesData();
-  }, [pageNumber, data]);  // // Delete Users in Backend
+  }, []);  // // Delete Users in Backend
 
   const deleteEmployeeData = async (id) => {
     try {
@@ -84,8 +206,8 @@ const Admin = () => {
         text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
         confirmButtonText: 'Yes, delete it!'
       })
 
@@ -115,108 +237,7 @@ const Admin = () => {
                 <BadgeIcon /> Employees
               </h1>
 
-              {loginData.userType === 755 &&
-                <form onSubmit={getEmployeesData}>
-                  <div className="input_container">
-                    <div className="admin_input">
-                      <label htmlFor="designation">Designation: </label>
-                      <input type="text" value={data.designation} onChange={handleChange}
-
-                        name="designation" />
-                    </div>
-                    <div className="admin_input">
-                      <label htmlFor="team">Team: </label>
-                      <input type="text" value={data.team} onChange={handleChange}
-
-                        name="team" />
-                    </div>
-                    <div className="admin_input">
-                      <label htmlFor="reporting">Reporting To: </label>
-                      <input type="text" value={data.reporting} onChange={handleChange}
-
-                        name="reporting" />
-                    </div>
-                    <div className="admin_input">
-                      <label htmlFor="joiningDate">Sort: </label>
-                      <input type="checkbox" defaultChecked={data.joiningDate} onChange={checkboxChange}
-                        name="joiningDate" />
-                    </div>
-                  </div>
-                </form>
-              }
-              <div class="table-responsive">
-                <table className="table mt-5 table-striped table-hover table-bordered admin-table">
-                  <thead>
-                    <tr className="table-dark">
-                      <th scope="col">ID</th>
-                      <th scope="col">Name</th>
-                      <th scope="col">Email</th>
-                      <th scope="col">Designation</th>
-                      <th scope="col">Reporting To</th>
-                      <th scope="col">Team</th>
-                      <th scope="col">Joining Date</th>
-                      {loginData.userType === 755 && <th scope="col">Actions</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {getEmployees && getEmployees.length > 0 ? getEmployees.map((element, id) => {
-                      return (
-                        <tr key={id + 1}>
-                          <th scope="row">{id + 1}</th>
-                          <td>{element.name}</td>
-                          <td>{element.email}</td>
-                          <td>{element.designation}</td>
-                          <td>{element.reportingTo}</td>
-                          <td>{element.team}</td>
-                          <td>{new Date(element.joiningDate).toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
-                          {loginData.userType === 755 && <td className="d-flex justify-content-between">
-                            <NavLink to={`/view/${element._id}`}>
-                              {' '}
-                              <RemoveRedEyeIcon className="logo abort" />
-                            </NavLink>
-                            <NavLink to={`/admin/edit/${element._id}`}>
-                              <EditIcon className="logo edit " />
-                            </NavLink>
-                            {loginData.userType !== 755}
-                            <DeleteIcon className="logo delete" onClick={() => deleteEmployeeData(element._id)} />
-                          </td>}
-
-                        </tr>
-                      );
-                    }) : <td colSpan="8" style={{ textAlign: "center" }}>No Employees</td>}
-                  </tbody>
-                </table>
-              </div>
-              {loginData.userType === 755 && <ul className="pagination justify-content-center">
-                <li className="page-item">
-                  <button className="page-link" onClick={() => {
-                    setPageNumber(Math.max(0, pageNumber - 1),
-                    );
-                  }} aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                    <span className="sr-only"></span>
-                  </button>
-                </li>
-                {pages.map((pageIndex) => {
-                  return (
-                    <li className="page-item" key={pageIndex}>
-                      <button className="page-link" onClick={() => {
-                        setLoading(false);
-                        setPageNumber(pageIndex + 1)
-                      }}>{pageIndex + 1}</button>
-                    </li>
-                  )
-                })}
-                <li className="page-item">
-                  <button className="page-link" onClick={() => {
-                    setPageNumber(Math.min(numberOfPages, pageNumber + 1))
-                  }}
-                    aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                    <span className="sr-only"></span>
-                  </button>
-                </li>
-              </ul>}
+              <GridTable columns={columns} rows={row} pageSize={8} />
 
             </>
           )

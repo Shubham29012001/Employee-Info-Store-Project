@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Signup from './components/signup/signup.js';
 import Navbar from './components/navbar/navbar.js';
 import Login from './components/login/login.js';
-import Dashboard from './components/dashboard/dashboard.js';
 import Home from './components/home/home.js';
 import Admin from './components/admin/admin.js';
 import Detail from './components/detail/detail.js';
@@ -24,6 +23,7 @@ import CreateMeeting from './components/createmeeting/createmeeting.js';
 
 function App() {
   const [loginData, setloginData] = useContext(loginContext);
+
   return (
     <>
       <Navbar />
@@ -44,7 +44,8 @@ function App() {
           <>
             {loginData && loginData.userType === 255 ? (
               <>
-                <Route path="/dashboard" exact element={<Dashboard />} />
+                <Route path="/employee" exact element={<Admin />} />
+                <Route path="/meetings" exact element={<Meeting />} />
                 <Route path="/meetings/create" exact element={<CreateMeeting />} />
                 <Route path="/meetings/edit/:id" exact element={<EditMeeting />} />
               </>
@@ -54,7 +55,6 @@ function App() {
               )}
           </>
         )}
-        <Route path="/*" exact element={<Navigate replace to="/" />} />
       </Routes>
       <ToastContainer autoClose={2000} limit={3} />
     </>

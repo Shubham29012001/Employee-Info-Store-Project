@@ -12,17 +12,16 @@ import {
     loginContext
 } from '../context/contextProvider.js';
 
+import { Tooltip, IconButton } from '@mui/material';
 import { toast } from 'react-toastify';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AuthServices from '../../ApiServices/authServices.js';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Swal from 'sweetalert2'
-import _ from 'lodash';
+import GridTable from "@nadavshaar/react-grid-table";
 
 const Meeting = () => {
-    const [pageNumber, setPageNumber] = useState(1);
-    const [getMeets, setMeets] = useState([]);
-    const [numberOfPages, setNumberOfPages] = useState(0);
+    const [row, setRow] = useState([]);
     const [loading, setLoading] = useState(false);
 
     // Using Context Values
@@ -32,21 +31,123 @@ const Meeting = () => {
     const [deleteMeetData, setdeleteMeetData] = useContext(deleteMeetDataContext);
     const [loginData, setloginData] = useContext(loginContext);
 
-    const pages = new Array(numberOfPages).fill(null).map((v, i) => i);
+
+    const columns = [
+        {
+            id: 1,
+            field: "id",
+            label: "ID",
+            cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+                return (
+                    <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} > <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} > {rowIndex}</div ></div >
+                )
+            },
+            width: "60px"
+        },
+        {
+            id: 2,
+            field: "meetTitle",
+            label: "Meet Title"
+        },
+        {
+            id: 3,
+            field: "meetCreatedBy",
+            label: "Meet Created By",
+        },
+        {
+            id: 4,
+            field: "meetingRoom",
+            label: "Meeting Room ",
+        },
+        {
+            id: 5,
+            field: "meetMembers",
+            label: "Meet Participants",
+            cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+                return (
+                    <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
+                        <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
+                            {data.meetMembers.map((v, id) => {
+                                return (
+                                    <ul style={{ margin: "0", padding: "0" }}>
+                                        <tr key={id + 1} ><td>{id + 1}) {v}</td></tr>
+                                    </ul>
+                                )
+                            })}
+                        </div>
+                    </div>
+                )
+            }
+
+        },
+        {
+            id: 6,
+            field: "meetTiming",
+            label: "Meet Timing ",
+            cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+                return (
+                    <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
+                        <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
+                            {new Date(data.meetStartingTime).toLocaleString('en-GB', { timeZone: 'IST' })}<br /> {new Date(data.meetEndingTime).toLocaleString('en-GB', { timeZone: 'IST' })}
+                        </div>
+                    </div>
+                )
+            }
+        },
+        {
+            id: 7,
+            field: "actions",
+            label: "Actions",
+            cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+                return (
+                    <>
+                        <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
+                            <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
+                                <Tooltip title="Abort Meeting">
+                                    <IconButton>
+                                        <CancelIcon className="logo abort" onClick={() => abortMeeting(data._id)} />
+                                    </IconButton>
+                                </Tooltip>
+                                {
+                                    (loginData.userType === 755 || loginData.email === data.meetCreatedBy) &&
+                                    <>
+                                        <Tooltip title="Edit Meeting">
+                                            <IconButton >
+                                                <NavLink to={`/meetings/edit/${data._id}`}>
+                                                    <EditIcon className="logo edit" />
+                                                </NavLink>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title="Delete Meeting">
+                                            <IconButton >
+                                                <DeleteIcon className="logo delete" onClick={() => deleteMeetingData(data._id)} />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </>
+                                }
+                            </div >
+                        </div >
+
+                    </>
+
+                )
+            }
+        },
+    ];
+
 
     const getMeetingsData = async (e) => {
         try {
             if (loginData.userType === 755) {
-                const { data: res } = await AuthServices.getMeetings(pageNumber);
+                const { data: res } = await AuthServices.getMeetings();
                 if (res) {
-                    setMeets(res.allMeetings);
-                    setNumberOfPages(res.numberOfPages)
+                    setRow(res.allMeetings);
                 }
             }
             else {
                 const { data: res } = await AuthServices.getMeetingsByIndividual(loginData.email);
                 if (res) {
-                    setMeets(res.findParticularMeet);
+                    setRow(res.findParticularMeet);
                 }
             }
 
@@ -55,17 +156,15 @@ const Meeting = () => {
         catch (error) {
             console.log(error.response.data.msg);
             setloginData(null)
+            setLoading(false)
+            setRow([])
         }
     }
 
-    const delay = _.debounce(() => {
-        getMeetingsData();
-    }, 500);
-
 
     useEffect(() => {
-        delay();
-    }, [pageNumber]);  // // Delete Users in Backend
+        getMeetingsData();
+    }, []);  // // Delete Users in Backend
 
     const deleteMeetingData = async (id) => {
         try {
@@ -74,8 +173,8 @@ const Meeting = () => {
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Yes, delete it!'
             })
 
@@ -101,8 +200,8 @@ const Meeting = () => {
                 text: "You won't be able to revert this!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Yes, abort it!'
             })
 
@@ -110,11 +209,6 @@ const Meeting = () => {
 
                 const { data: res } = await AuthServices.abortMeeting(id);
                 if (res) {
-                    Swal.fire(
-                        'Aborted!',
-                        'You have aborted the meeting.',
-                        'success'
-                    )
                     toast.success("Meeting Aborted Successfully");
                     setdeleteMeetData(deleteMeetData);
                     getMeetingsData();
@@ -130,83 +224,13 @@ const Meeting = () => {
         <>
             <div className="mt-3">
                 <div className="container">
-                    {loading === false ? <> {loginData.userType === 755 && <Loader />} </> : <> <h1> <GroupsIcon /> Meetings</h1>
+                    {loading === false ? <> <Loader /> </> : <><h1> <GroupsIcon /> Meetings</h1>
                         <div className="add-btn mt-2">
-                            <NavLink className="btn btn-primary navlink" to="/meetings/create">
+                            <NavLink className="btn btn-primary navlink" style={{ backgroundColor: "#25316d" }} to="/meetings/create">
                                 Create Meetings
                             </NavLink>
                         </div>
-                        <table className="table mt-5 table-striped table-hover table-bordered">
-                            <thead>
-                                <tr className="table-dark">
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Title</th>
-                                    <th scope="col">Created By</th>
-                                    <th scope="col">Meeting Room</th>
-                                    <th scope="col">Participants</th>
-                                    <th scope="col">Meet Timing</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {getMeets && getMeets.length > 0 ? getMeets.map((element, id) => {
-
-                                    return (
-                                        <tr key={id + 1}>
-                                            <th scope="row">{id + 1}</th>
-                                            <td>{element.meetTitle}</td>
-                                            <td>{element.meetCreatedBy}</td>
-                                            <td>{element.meetingRoom}</td>
-                                            <td> {element.meetMembers.map((v, id) => {
-                                                return (
-                                                    <tr key={id + 1}><td>{id + 1}) {v}</td></tr>
-                                                )
-                                            })}</td>
-                                            <td>{new Date(element.meetStartingTime).toLocaleString('en-GB', { timeZone: 'UTC' }) + " - " + new Date(element.meetEndingTime).toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
-                                            <td className="d-flex justify-content-between height-100">
-                                                <CancelIcon className="logo abort" onClick={() => abortMeeting(element._id)} />
-                                                {
-                                                    (loginData.userType === 755 || loginData.email === element.meetCreatedBy) &&
-                                                    <>
-                                                        <NavLink to={`/meetings/edit/${element._id}`}>
-                                                            <EditIcon className="logo edit" />
-                                                        </NavLink>
-
-                                                        <DeleteIcon className="logo delete" onClick={() => deleteMeetingData(element._id)} />
-                                                    </>
-                                                }
-                                            </td>
-                                        </tr>
-                                    );
-                                }) : <td colSpan="7" style={{ textAlign: "center" }}>No Meetings</td>}
-                            </tbody>
-                        </table>
-                        {loginData.userType === 755 && <ul className="pagination justify-content-center">
-                            <li className="page-item">
-                                <button className="page-link paginate" onClick={() => {
-                                    setPageNumber(Math.max(0, pageNumber - 1));
-                                }} aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span className="sr-only"></span>
-                                </button>
-                            </li>
-                            {pages.map((pageIndex) => {
-                                return (
-                                    <li className="page-item" key={pageIndex}>
-                                        <button className="page-link" onClick={() => { setPageNumber(pageIndex + 1) }}>{pageIndex + 1}</button>
-                                    </li>
-                                )
-                            })}
-                            <li className="page-item">
-                                <button className="page-link paginate" onClick={() => {
-                                    setPageNumber(Math.min(numberOfPages, pageNumber + 1))
-                                }}
-                                    aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                    <span className="sr-only"></span>
-                                </button>
-                            </li>
-                        </ul>}
+                        <GridTable columns={columns} rows={row} pageSize={4} />
                     </>}
 
                 </div>

@@ -5,7 +5,7 @@
 }
 
 .pagination button {
-  color: black;
+  color: #25316d;
   padding: 3px !important;
   margin: 10px;
   width: 40px;
@@ -36,6 +36,7 @@ h1 {
 
 input[type] {
   margin-left: 10px;
+  padding-left: 5px;
 }
 
 label {
@@ -44,10 +45,23 @@ label {
 
 .admin_input > input[type] {
   border-radius: 10px;
-  text-align: center;
 }
 
 .admin-table > th,
 .admin-table > td {
   padding: 9px !important;
+}
+
+.table-color {
+  background-color: #25316d !important;
+  color: white;
+}
+
+.table-color > th {
+  border-color: #5f6f94 !important;
+}
+
+.page-item > button:hover {
+  background-color: #25316d !important;
+  color: white !important;
 }

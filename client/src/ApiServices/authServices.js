@@ -13,13 +13,8 @@ class AuthServices {
   }
 
   getEmployees(page, data) {
-    const { designation, team, reporting, joiningDate } = data;
-    let sort = -1;
-    if (joiningDate) {
-      sort = 1;
-    }
 
-    return axios.get(`/employees/?page=${page}&sort=${sort}&designation=${designation}&team=${team}&reporting=${reporting}`, {
+    return axios.get(`/employees/`, {
       headers: {
         Authorization:
           "Bearer " +

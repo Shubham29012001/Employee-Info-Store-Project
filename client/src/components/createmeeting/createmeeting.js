@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 // Importing updateContext Provider
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 
 import { addMeetDataContext, loginContext } from "../context/contextProvider.js";
 import AuthServices from "../../ApiServices/authServices.js";
@@ -58,7 +59,6 @@ const CreateMeeting = () => {
         <div className="container mt-3 mb-4">
             <form onSubmit={handleSubmit}>
                 <div className="row">
-
                     <div className="mb-3 col-lg-6 col-md-6 col-12">
                         <label htmlFor="meetTitle" className="form-label">
                             Meet Title
@@ -143,9 +143,17 @@ const CreateMeeting = () => {
                             <option value="6">6</option>
                         </select>
                     </div>
-                    <button type="submit" className="btn btn-primary mt-3">
-                        Submit
-                    </button>
+                    <div className="mb-3 col-lg-6 col-md-6 col-12">
+                    </div>
+                    <div className="mb-3 d-flex justify-content-center">
+                        <KeyboardBackspaceIcon className="col-lg-3 col-md-3 col-12 m-4" style={{ fontSize: "40px", cursor: "pointer" }} onClick={() => {
+                            history('/meetings');
+                        }} />
+                        <button type="submit" className="btn btn-primary col-lg-2 col-md-3 col-12 m-4" style={{ backgroundColor: "#25316d" }}>
+                            Submit
+                        </button>
+                    </div>
+
                 </div>
             </form >
         </div >
