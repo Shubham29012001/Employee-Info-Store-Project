@@ -2,11 +2,13 @@ const employee = require('../models/employee');
 const { badRequestError, customAPIError } = require('../errors/')
 
 const getEmployeeDetails = async (req, res) => {
-    const { sort, team, designation, reporting } = req.query;
+    const { sort, team, designation, reporting, search, limit, page } = req.query;
 
-    let limit = parseInt(req.query.limit) || 7;
-    let page = parseInt(req.query.page) || 1;
-    let skip = (page - 1) * limit;
+    let skip = 0;
+
+    if (limit || page) {
+        skip = (page - 1) * limit;
+    }
 
     let queryObject = {};
 
@@ -22,15 +24,28 @@ const getEmployeeDetails = async (req, res) => {
         queryObject.reportingTo = new RegExp(reporting, 'i');
     }
 
+    if (search) {
+        queryObject.name = new RegExp(`^${search}`, 'i');
+    }
+
     let employees = employee.find(queryObject).select('-password');
+    let totalEmployees;
+    let numberOfPages;
+    let completeEmployee;
 
-    employees = employees.skip(skip).limit(limit);
-    const completeEmployee = await employees.sort({ 'joiningDate': sort }).select('-password').select('-userType');
+    if (limit || page || sort) {
+        employees = employees.skip(skip).limit(limit);
+        totalEmployees = await employee.countDocuments(queryObject);
+        numberOfPages = Math.ceil(totalEmployees / limit);
 
-    const totalEmployees = await employee.countDocuments(queryObject);
-    const numberOfPages = Math.ceil(totalEmployees / limit);
+        completeEmployee = await employees.sort({ 'joiningDate': sort }).select('-password').select('-userType');
+        res.status(200).json({ completeEmployee, totalEmployees, numberOfPages });
+    }
+    else {
+        completeEmployee = await employees.select('-password').select('-userType');
+        res.status(200).json({ completeEmployee });
+    }
 
-    res.status(200).json({ completeEmployee, totalEmployees, numberOfPages });
 };
 
 const getIndividualEmployeeDetails = async (req, res) => {

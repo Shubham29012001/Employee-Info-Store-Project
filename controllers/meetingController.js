@@ -13,13 +13,8 @@ const getAllMeetingDetails = async (req, res) => {
         queryObject.particularValue = req.body.particularValue;
     }
 
-    let limit = parseInt(req.query.limit) || 5;
-    let page = parseInt(req.query.page) || 1;
-    let skip = (page - 1) * limit;
-    const allMeetings = await meeting.find(queryObject).skip(skip).limit(limit);
+    const allMeetings = await meeting.find(queryObject);
 
-    const totalMeetings = await meeting.countDocuments(queryObject.meetCreatedBy);
-    const numberOfPages = Math.ceil(totalMeetings / limit);
     let particularMember = [];
 
     for (let i = 0; i < allMeetings.length; i++) {
@@ -44,7 +39,7 @@ const getAllMeetingDetails = async (req, res) => {
         allMeetings[i].meetMembers = meetMembersArray;
     }
 
-    res.status(200).json({ allMeetings, totalMeetings, numberOfPages, particularMember });
+    res.status(200).json({ allMeetings, particularMember });
 };
 
 const getIndividualMeetingDetails = async (req, res) => {
