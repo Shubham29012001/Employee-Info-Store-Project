@@ -100,3 +100,8 @@
   color: white;
   margin: 10px;
 }
+
+.green_btn:hover,
+.white_btn:hover {
+  background-color: #5f6f94;
+}

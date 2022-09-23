@@ -10,34 +10,19 @@
   color: white !important;
   margin-bottom: 1rem;
 }
-.pagination {
-  position: fixed;
-  bottom: 25px;
-  left: 43% !important;
-}
-
-.pagination button {
-  color: #25316d;
-  padding: 3px !important;
-  margin: 10px;
-  width: 40px;
-}
-
-.pagination span {
-  font-size: 15px !important;
-}
 
 h1 {
   font-size: 30px !important;
 }
 
-.table-color {
+.btn-primary {
   background-color: #25316d !important;
-  color: white;
+  float: right;
+  margin-bottom: 20px;
 }
 
-.table-color > th {
-  border-color: #5f6f94 !important;
+.btn-primary:hover {
+  background-color: #5f6f94 !important;
 }
 
 .page-item > button:hover {

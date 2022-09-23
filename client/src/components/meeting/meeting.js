@@ -311,7 +311,7 @@ const Meeting = () => {
             <div className="mt-3">
                 <div className="container">
                     {loading === false ? <> <Loader /> </> : <><h1> <GroupsIcon /> Meetings</h1>
-                        <div className="add-btn mt-2 btn btn-primary navlink" onClick={handleShow}>
+                        <div className="add-btn mt-2 btn btn-primary navlink createMeeting" onClick={handleShow}>
                             Create Meetings
                         </div>
                         <GridTable columns={columns} rows={row} pageSize={4} />
