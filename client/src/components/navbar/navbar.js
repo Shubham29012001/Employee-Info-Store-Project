@@ -69,7 +69,7 @@ const Navbar = () => {
                   <>
                     <li className="nav-item">
                       <Link
-                        className="nav-link "
+                        className="nav-link"
                         aria-current="page"
                         to="/admin"
                       >
@@ -78,7 +78,7 @@ const Navbar = () => {
                     </li>
                     <li className="nav-item">
                       <Link
-                        className="nav-link "
+                        className="nav-link"
                         aria-current="page"
                         to="/meetings"
                       >
@@ -92,7 +92,7 @@ const Navbar = () => {
                   <>
                     <li className="nav-item">
                       <Link
-                        className="nav-link "
+                        className="nav-link"
                         aria-current="page"
                         to="/employee"
                       >
@@ -101,7 +101,7 @@ const Navbar = () => {
                     </li>
                     <li className="nav-item">
                       <Link
-                        className="nav-link "
+                        className="nav-link"
                         aria-current="page"
                         to="/meetings"
                       >

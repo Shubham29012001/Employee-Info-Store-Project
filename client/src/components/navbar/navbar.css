@@ -2,11 +2,7 @@
   outline: none;
   border: 0;
   background-color: #0f3460;
-  border-radius: 15px;
-}
-
-.logout:hover {
-  color: #fff !important;
+  border-radius: 10px;
 }
 
 .navbar-items {
@@ -23,7 +19,8 @@
 }
 
 .logout:hover {
-  background-color: #3184ff;
+  background-color: #5f6f94;
+  color: white !important;
 }
 
 .items {

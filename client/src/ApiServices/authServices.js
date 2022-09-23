@@ -93,7 +93,6 @@ class AuthServices {
   }
 
   getMeeting(id) {
-    console.log(id);
     return axios.get(`/meetings/${id}`, {
       headers: {
         Authorization:

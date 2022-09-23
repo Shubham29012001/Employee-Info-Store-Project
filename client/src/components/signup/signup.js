@@ -43,8 +43,7 @@ const Signup = () => {
           toast.success('User Signed Up Successfully');
           localStorage.setItem('userDetails', JSON.stringify(res));
           setloginData(res);
-
-          navigate('/dashboard');
+          navigate('/employee');
         }
       } catch (error) {
         if (
