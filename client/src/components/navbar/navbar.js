@@ -65,7 +65,7 @@ const Navbar = () => {
                   </>
 
                 }
-                {loginData && loginData.userType === 755 &&
+                {loginData && (loginData.userType === 755 || loginData.userType === 955) &&
                   <>
                     <li className="nav-item">
                       <Link

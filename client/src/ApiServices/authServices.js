@@ -63,6 +63,15 @@ class AuthServices {
     })
   }
 
+  giveAdminAccess(id) {
+    return axios.put(`/employees/employee/access/${id}`, '', {
+      headers: {
+        Authorization:
+          "Bearer " +
+          getUserDetails.accessToken,
+      }
+    })
+  }
   getMeetings(page) {
     return axios.get(`/meetings/?page=${page}`, {
       headers: {

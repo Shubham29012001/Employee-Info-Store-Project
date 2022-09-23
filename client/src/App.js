@@ -23,7 +23,7 @@ import CreateMeeting from './components/createmeeting/createmeeting.js';
 
 function App() {
   const [loginData, setloginData] = useContext(loginContext);
-  
+
   return (
     <>
       <Navbar />
@@ -31,7 +31,7 @@ function App() {
         <Route path="/" exact element={<Home />} />
         <Route path="/login" exact element={<Login />} />
         <Route path="/signup" exact element={<Signup />} />
-        {loginData && loginData.userType === 755 ? (
+        {loginData && (loginData.userType === 755 || loginData.userType === 955) ? (
           <>
             <Route path="/admin" exact element={<Admin />} />
             <Route path="/meetings" exact element={<Meeting />} />

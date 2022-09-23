@@ -8,6 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Tooltip, IconButton } from '@mui/material';
 import GridTable from "@nadavshaar/react-grid-table";
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 import {
   addUserDataContext,
@@ -31,7 +32,7 @@ const Admin = () => {
   const [deleteUserData, setdeleteUserData] = useContext(deleteUserDataContext);
   const [loginData, setloginData] = useContext(loginContext);
 
-  const columns = loginData.userType === 755 ? [
+  const columns = loginData.userType === 755 || loginData.userType === 955 ? [
     {
       id: 1,
       field: "id",
@@ -88,6 +89,12 @@ const Admin = () => {
           <>
             <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
               <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
+                {loginData.userType === 955 && <Tooltip title="Give Access">
+                  <IconButton onClick={() => giveAdminAccess(data._id)} >
+                    <AdminPanelSettingsIcon className="logo" />
+                  </IconButton>
+                </Tooltip>}
+
                 <NavLink to={`/view/${data._id}`}>
                   {' '}
                   <Tooltip title="View Employee">
@@ -173,13 +180,13 @@ const Admin = () => {
 
   const getEmployeesData = async () => {
     try {
-      if (loginData.userType === 755) {
+      if (loginData.userType === 755 || loginData.userType === 955) {
         const { data: res } = await AuthServices.getEmployees();
         if (res) {
           setRow(res.completeEmployee);
         }
       }
-      else {
+      else if (loginData.userType === 255) {
         const { data: res } = await AuthServices.getEmployeesByTeam(loginData.email);
         if (res) {
           setRow(res.teamEmployee);
@@ -198,6 +205,33 @@ const Admin = () => {
   useEffect(() => {
     getEmployeesData();
   }, []);  // // Delete Users in Backend
+
+  const giveAdminAccess = async (id) => {
+    try {
+      const swalFire = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, give access!'
+      })
+
+      if (swalFire.isConfirmed) {
+        const { data: res } = await AuthServices.giveAdminAccess(id);
+        if (res) {
+          getEmployeesData();
+          toast.success(res.msg)
+        }
+      }
+
+    }
+    catch (error) {
+      console.log(error)
+      toast.error(error.response.data.msg);
+    }
+  }
 
   const deleteEmployeeData = async (id) => {
     try {
@@ -236,9 +270,7 @@ const Admin = () => {
               <h1>
                 <BadgeIcon /> Employees
               </h1>
-
               <GridTable columns={columns} rows={row} pageSize={8} />
-
             </>
           )
           }

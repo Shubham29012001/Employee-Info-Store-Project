@@ -109,7 +109,7 @@ const Meeting = () => {
                                     </IconButton>
                                 </Tooltip>
                                 {
-                                    (loginData.userType === 755 || loginData.email === data.meetCreatedBy) &&
+                                    (loginData.userType === 755 || loginData.userType === 955 || loginData.email === data.meetCreatedBy) &&
                                     <>
                                         <Tooltip title="Edit Meeting">
                                             <IconButton >
@@ -138,13 +138,13 @@ const Meeting = () => {
 
     const getMeetingsData = async (e) => {
         try {
-            if (loginData.userType === 755) {
+            if (loginData.userType === 755 || loginData.userType === 955) {
                 const { data: res } = await AuthServices.getMeetings();
                 if (res) {
                     setRow(res.allMeetings);
                 }
             }
-            else {
+            else if (loginData.userType === 255) {
                 const { data: res } = await AuthServices.getMeetingsByIndividual(loginData.email);
                 if (res) {
                     setRow(res.findParticularMeet);

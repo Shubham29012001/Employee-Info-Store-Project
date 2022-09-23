@@ -95,7 +95,7 @@ const Detail = () => {
 
   // Return the User Details if ID gets Matched with loginContext ID value else Show Unauthorized Access
 
-  if (getID === id || loginData.userType === 755) {
+  if (getID === id || loginData.userType === 755 || loginData.userType === 955) {
     return (
       <div className="container mt-3">
         <h1 style={{ fontWeight: 400, textAlign: "center" }}>
@@ -118,7 +118,7 @@ const Detail = () => {
               <CardContent>
                 <div className="row">
                   <div className="right_view col-12 col-lg-12 col-md-12">
-                    {loginData.userType === 755 && (
+                    {(loginData.userType === 755 || loginData.userType === 955) && (
                       <div className="add_btn">
                         <Tooltip title="Edit Employee">
                           <IconButton className=" editdetail logodetail">

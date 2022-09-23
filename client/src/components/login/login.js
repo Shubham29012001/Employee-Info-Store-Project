@@ -32,7 +32,7 @@ const Login = () => {
           setloginData(res);
           localStorage.setItem('userDetails', JSON.stringify(res));
           toast.success("Login Successfully");
-          res.userType === 755 ? history('/admin') : history('/employee');
+          res.userType === 755 || res.userType === 955 ? history('/admin') : history('/employee');
         }
       } catch (error) {
         if (

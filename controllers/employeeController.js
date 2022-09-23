@@ -93,6 +93,39 @@ const deleteIndividualEmployeeDetails = async (req, res) => {
 
 };
 
+const giveAdminAccess = async (req, res) => {
+    const id = req.params.id;
+    if (id) {
+
+        const findEmployee = await employee.findOne({ _id: id, userType: 755 });
+
+        if (!findEmployee) {
+
+            const individualEmployee = await employee.findByIdAndUpdate({ _id: id },
+                { userType: 755 },
+                { new: true, runValidators: true }
+            ).select('-password').select('-userType');
+
+            if (individualEmployee) {
+                res.status(200).json({ individualEmployee, msg: "Access Given Successfully" });
+            }
+        } else {
+            const individualEmployee = await employee.findByIdAndUpdate({ _id: id },
+                { userType: 255 },
+                { new: true, runValidators: true }
+            ).select('-password').select('-userType');
+
+            if (individualEmployee) {
+                res.status(200).json({ individualEmployee, msg: "Access Revoked Successfully" });
+            }
+        }
+
+    }
+    else {
+        throw new badRequestError("Please provide Employee ID");
+    }
+};
+
 const updateIndividualEmployeeDetail = async (req, res) => {
     const id = req.params.id;
 
@@ -116,10 +149,12 @@ const updateIndividualEmployeeDetail = async (req, res) => {
     }
 };
 
+
 module.exports = {
     getEmployeeDetails,
     deleteIndividualEmployeeDetails,
     getIndividualEmployeeDetails,
     updateIndividualEmployeeDetail,
-    getEmployeeByTeam
+    getEmployeeByTeam,
+    giveAdminAccess
 }
