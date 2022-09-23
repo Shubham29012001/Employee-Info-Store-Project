@@ -339,7 +339,7 @@ const Admin = () => {
               <h1>
                 <BadgeIcon /> Employees
               </h1>
-              <GridTable columns={columns} rows={row} pageSize={8} />
+              <GridTable columns={columns} rows={row} pageSize={8} requestDebounceTimeout={500} />
 
               <Modal show={show} onHide={handleClose} centered>
                 <Modal.Body>
@@ -408,9 +408,9 @@ const Admin = () => {
 
               <Modal size="lg" show={editShow} onHide={handleEditClose} centered>
                 <Modal.Header closeButton>
-                  <Modal.Title>Edit Employees</Modal.Title>
+                  <Modal.Title className="w-100 text-center">Edit Employees</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body >
                   <form>
                     <div className="row">
                       <div className="mb-3 col-lg-6 col-md-6 col-12">

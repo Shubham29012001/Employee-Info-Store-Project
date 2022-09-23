@@ -314,14 +314,14 @@ const Meeting = () => {
                         <div className="add-btn mt-2 btn btn-primary navlink createMeeting" onClick={handleShow}>
                             Create Meetings
                         </div>
-                        <GridTable columns={columns} rows={row} pageSize={4} />
+                        <GridTable columns={columns} rows={row} pageSize={4} requestDebounceTimeout={500} />
                     </>}
 
                     <Modal size="lg" show={show} onHide={handleClose} centered>
                         <Modal.Header closeButton>
-                            <Modal.Title>Create Meetings</Modal.Title>
+                            <Modal.Title className="w-100 text-center">Create Meetings</Modal.Title>
                         </Modal.Header>
-                        <Modal.Body>
+                        <Modal.Body className="mt-2">
                             <form>
                                 <div className="row">
                                     <div className="mb-3 col-lg-6 col-md-6 col-12">
@@ -423,9 +423,9 @@ const Meeting = () => {
 
                     <Modal size="lg" show={editShow} onHide={handleEditClose} centered>
                         <Modal.Header closeButton>
-                            <Modal.Title>Edit Meetings</Modal.Title>
+                            <Modal.Title className="w-100 text-center">Edit Meetings</Modal.Title>
                         </Modal.Header>
-                        <Modal.Body>
+                        <Modal.Body className="mt-2">
                             <form>
                                 <div className="row">
                                     <div className="mb-3 col-lg-6 col-md-6 col-12">
