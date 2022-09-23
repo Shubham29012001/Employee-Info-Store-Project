@@ -41,12 +41,7 @@ const CreateMeeting = () => {
                 if (res) {
                     setmeetData(res);
                     toast.success("Meeting Created Successfully");
-                    if (loginData.userType === 755) {
-                        history("/meetings");
-                    }
-                    else {
-                        history("/dashboard");
-                    }
+                    history("/meetings");
                 }
             }
             catch (error) {

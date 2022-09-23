@@ -104,8 +104,8 @@ const Meeting = () => {
                         <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
                             <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
                                 <Tooltip title="Abort Meeting">
-                                    <IconButton>
-                                        <CancelIcon className="logo abort" onClick={() => abortMeeting(data._id)} />
+                                    <IconButton onClick={() => abortMeeting(data._id)}>
+                                        <CancelIcon className="logo abort" />
                                     </IconButton>
                                 </Tooltip>
                                 {
@@ -119,8 +119,8 @@ const Meeting = () => {
                                             </IconButton>
                                         </Tooltip>
                                         <Tooltip title="Delete Meeting">
-                                            <IconButton >
-                                                <DeleteIcon className="logo delete" onClick={() => deleteMeetingData(data._id)} />
+                                            <IconButton onClick={() => deleteMeetingData(data._id)} >
+                                                <DeleteIcon className="logo delete" />
                                             </IconButton>
                                         </Tooltip>
                                     </>
@@ -157,7 +157,6 @@ const Meeting = () => {
             console.log(error.response.data.msg);
             setloginData(null)
             setLoading(false)
-            setRow([])
         }
     }
 
@@ -210,7 +209,6 @@ const Meeting = () => {
                 const { data: res } = await AuthServices.abortMeeting(id);
                 if (res) {
                     toast.success("Meeting Aborted Successfully");
-                    setdeleteMeetData(deleteMeetData);
                     getMeetingsData();
                 }
             }

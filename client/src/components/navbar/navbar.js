@@ -119,6 +119,7 @@ const Navbar = () => {
                       className="nav-link logout"
                       aria-current="page"
                       onClick={() => {
+                        localStorage.removeItem('userDetails');
                         setloginData(null);
                         setuserData(null);
                         setmeetData(null);
@@ -126,7 +127,6 @@ const Navbar = () => {
                         setupdateUserData(null);
                         setdeleteMeetData(null);
                         setdeleteUserData(null);
-                        localStorage.removeItem('userDetails');
                         navigate('/')
                       }}
                     >

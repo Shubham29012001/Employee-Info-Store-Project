@@ -29,9 +29,9 @@ const Login = () => {
       try {
         const { data: res } = await AuthServices.login(data);
         if (res) {
+          setloginData(res);
           localStorage.setItem('userDetails', JSON.stringify(res));
           toast.success("Login Successfully");
-          setloginData(res);
           res.userType === 755 ? history('/admin') : history('/employee');
         }
       } catch (error) {

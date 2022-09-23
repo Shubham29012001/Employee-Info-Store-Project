@@ -242,7 +242,7 @@ const abortFromMeeting = async (req, res) => {
 const getMeetingByIndividual = async (req, res) => {
     const particularValue = req.user.email;
     if (particularValue) {
-        const findParticularMeet = await meeting.aggregate([{ $match: { 'meetMembers': `${particularValue}` } }]);
+        const findParticularMeet = await meeting.aggregate([{ $match: { $or: [{ 'meetCreatedBy': `${particularValue}` }, { 'meetMembers': `${particularValue}` }] } }]);
         if (findParticularMeet) {
             for (let i = 0; i < findParticularMeet.length; i++) {
                 let getArrayName = [];
@@ -254,8 +254,6 @@ const getMeetingByIndividual = async (req, res) => {
                 }
                 findParticularMeet[i].meetMembers = getArrayName;
             }
-
-            console.log(findParticularMeet)
 
             res.status(200).json({ findParticularMeet });
         }

@@ -23,7 +23,7 @@ import CreateMeeting from './components/createmeeting/createmeeting.js';
 
 function App() {
   const [loginData, setloginData] = useContext(loginContext);
-
+  
   return (
     <>
       <Navbar />

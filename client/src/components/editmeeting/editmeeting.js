@@ -62,13 +62,7 @@ const EditMeeting = () => {
                 const { data: res } = await AuthServices.updateMeeting(id, data);
                 if (res) {
                     toast.success('Meeting Updated Successfully');
-                    setupdateMeetData(res);
-                    if (loginData.userType !== 755) {
-                        history("/dashboard");
-                    }
-                    else {
-                        history("/meetings");
-                    }
+                    history('/meetings')
                 }
             }
             catch (error) {
