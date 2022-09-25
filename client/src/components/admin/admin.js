@@ -18,7 +18,7 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import SaveIcon from '@mui/icons-material/Save';
 
 import {
   addUserDataContext,
@@ -88,6 +88,11 @@ const Admin = () => {
     },
     {
       id: 6,
+      field: "team",
+      label: "Team",
+    },
+    {
+      id: 7,
       field: "joiningDate",
       label: "Joining Date ",
       cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
@@ -101,17 +106,18 @@ const Admin = () => {
       }
     },
     {
-      id: 7,
+      id: 8,
       field: "actions",
       label: "Actions",
       cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
+        console.log(data)
         return (
           <>
             <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
               <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
                 {loginData.userType === 955 && <Tooltip title="Give Access">
-                  <IconButton onClick={() => giveAdminAccess(data._id)} >
-                    <AdminPanelSettingsIcon className="logo" />
+                  <IconButton onClick={() => giveAdminAccess(data._id, data.userType)} >
+                    <AdminPanelSettingsIcon className={`logo ${data.userType === 755 && 'access'}`} />
                   </IconButton>
                 </Tooltip>}
 
@@ -126,7 +132,7 @@ const Admin = () => {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete Employee">
-                  <IconButton onClick={() => deleteEmployeeData(data._id)} >
+                  <IconButton onClick={() => deleteEmployeeData(data._id, data.userType)} >
                     <DeleteIcon className="logo delete" />
                   </IconButton>
                 </Tooltip>
@@ -230,6 +236,7 @@ const Admin = () => {
     catch (error) {
       console.log(error.response.data.msg);
       setloginData(null)
+      localStorage.removeItem('userDetails');
       setLoading(false)
       setRow([])
     }
@@ -247,7 +254,9 @@ const Admin = () => {
       }
     }
     catch (error) {
-      console.log(error.response.data.msg);
+      console(error.response.data.msg);
+      localStorage.removeItem('userDetails');
+      setloginData(null);
     }
   };
 
@@ -273,52 +282,61 @@ const Admin = () => {
     getEmployeesData();
   }, []);  // // Delete Users in Backend
 
-  const giveAdminAccess = async (id) => {
+  const giveAdminAccess = async (id, userType) => {
     try {
-      const swalFire = await Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, give access!'
-      })
-
-      if (swalFire.isConfirmed) {
-        const { data: res } = await AuthServices.giveAdminAccess(id);
-        if (res) {
-          getEmployeesData();
-          toast.success(res.msg)
-        }
+      if (userType === 955) {
+        toast.error("Cannot Change Super Admin Access");
       }
+      else {
+        const swalFire = await Swal.fire({
+          title: 'Are you sure?',
+          text: "You are giving access to an user",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, give access!'
+        })
 
+        if (swalFire.isConfirmed) {
+          const { data: res } = await AuthServices.giveAdminAccess(id);
+          if (res) {
+            getEmployeesData();
+            toast.success(res.msg)
+          }
+        }
+
+      }
     }
     catch (error) {
-      console.log(error)
       toast.error(error.response.data.msg);
     }
   }
 
-  const deleteEmployeeData = async (id) => {
+  const deleteEmployeeData = async (id, userType) => {
     try {
-      const swalFire = await Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
-      })
+      if (userType === 955) {
+        toast.error("Cannot Delete Super Admin");
+      }
+      else {
+        const swalFire = await Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+        })
 
-      if (swalFire.isConfirmed) {
-        const { data: res } = await AuthServices.deleteEmployee(id);
-        if (res) {
-          handleClose();
-          getEmployeesData();
-          setdeleteUserData(deleteUserData);
-          toast.success("Employee Deleted Succesfully")
+        if (swalFire.isConfirmed) {
+          const { data: res } = await AuthServices.deleteEmployee(id);
+          if (res) {
+            handleClose();
+            getEmployeesData();
+            setdeleteUserData(deleteUserData);
+            toast.success("Employee Deleted Succesfully")
+          }
         }
       }
 
@@ -362,44 +380,44 @@ const Admin = () => {
                         </div>
                       )}
                       <h3>
-                        <BadgeIcon className="inner" /> Full Name:{" "}
-                        <span>{getUserData.name}</span>
+                        <BadgeIcon className="inner" /><span><b>Full Name:{" "}</b>
+                          {getUserData.name}</span>
                       </h3>
                       <h3>
-                        <MailOutlineIcon className="inner" /> Email:{" "}
-                        <span>{getUserData.email}</span>
+                        <MailOutlineIcon className="inner" /><span><b>Email:{" "}</b>
+                          {getUserData.email}</span>
                       </h3>
                       <h3>
-                        <DateRangeIcon className="inner" /> Date Of Birth:{" "}
-                        <span>{getUserData.dob}</span>
+                        <DateRangeIcon className="inner" /><span><b>Date Of Birth:{" "}</b>
+                          {getUserData.dob}</span>
                       </h3>
                       <h3>
-                        <HomeIcon className="inner" /> Home Address:{" "}
-                        <span>{getUserData.address}</span>
+                        <HomeIcon className="inner" /><span><b>Home Address:{" "}</b>
+                          {getUserData.address}</span>
                       </h3>
                       <h3>
-                        <PhoneIphoneIcon className="inner" /> Designation:{" "}
-                        <span>{getUserData.designation}</span>
+                        <PhoneIphoneIcon className="inner" /><span><b>Designation:{" "}</b>
+                          {getUserData.designation}</span>
                       </h3>
                       <h3>
-                        <CreditCardIcon className="inner" /> Reporting To:{" "}
-                        <span>{getUserData.reportingTo}</span>
+                        <CreditCardIcon className="inner" /><span><b>Reporting To:{" "}</b>
+                          {getUserData.reportingTo}</span>
                       </h3>
                       <h3>
-                        <GroupWorkIcon className="inner" /> Team:{" "}
-                        <span>{getUserData.team}</span>
+                        <GroupWorkIcon className="inner" /><span><b>Team:{" "}</b>
+                          {getUserData.team}</span>
                       </h3>
                       <h3>
-                        <MailOutlineIcon className="inner" /> Seat No:{" "}
-                        <span>{getUserData.seat}</span>
+                        <MailOutlineIcon className="inner" /><span><b>Seat No:{" "}</b>
+                          {getUserData.seat}</span>
                       </h3>
                       <h3>
-                        <DateRangeIcon className="inner" /> Joining Date:{" "}
-                        <span>{new Date(getUserData.joiningDate).toLocaleString('en-GB', { timeZone: 'UTC' })}</span>
+                        <DateRangeIcon className="inner" /><span><b>Joining Date:{" "}</b>
+                          {new Date(getUserData.joiningDate).toLocaleString('en-GB', { timeZone: 'UTC' })}</span>
                       </h3>
                       <h3>
-                        <CreditCardIcon className="inner" /> Preference Time:{" "}
-                        <span>{getUserData.preferenceStartTime + " - " + getUserData.preferenceEndTime}</span>
+                        <CreditCardIcon className="inner" /><span><b>Preference Time:{" "}</b>
+                          {getUserData.preferenceStartTime + " - " + getUserData.preferenceEndTime}</span>
                       </h3>
                     </div>
                   </div>
@@ -577,7 +595,7 @@ const Admin = () => {
                     Close
                   </Button>
                   <Button variant="primary" onClick={handleEditSubmit}>
-                    Edit
+                    Edit <SaveIcon />
                   </Button>
                 </Modal.Footer>
               </Modal>

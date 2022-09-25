@@ -21,6 +21,8 @@ import AuthServices from '../../ApiServices/authServices.js';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Swal from 'sweetalert2'
 import GridTable from "@nadavshaar/react-grid-table";
+import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
 
 const Meeting = () => {
 
@@ -202,6 +204,7 @@ const Meeting = () => {
         catch (error) {
             console.log(error.response.data.msg);
             setloginData(null)
+            localStorage.removeItem('userDetails');
             setLoading(false)
         }
     }
@@ -217,6 +220,8 @@ const Meeting = () => {
         }
         catch (error) {
             console.log(error.response.data.msg);
+            localStorage.removeItem('userDetails');
+            setloginData(null);
         }
     }
 
@@ -312,7 +317,7 @@ const Meeting = () => {
                 <div className="container">
                     {loading === false ? <> <Loader /> </> : <><h1> <GroupsIcon /> Meetings</h1>
                         <div className="add-btn mt-2 btn btn-primary navlink createMeeting" onClick={handleShow}>
-                            Create Meetings
+                            Create Meetings <AddIcon />
                         </div>
                         <GridTable columns={columns} rows={row} pageSize={4} requestDebounceTimeout={500} />
                     </>}
@@ -520,7 +525,7 @@ const Meeting = () => {
                                 Close
                             </Button>
                             <Button variant="primary" onClick={handleEditSubmit}>
-                                Edit
+                                Edit <SaveIcon className="logo" />
                             </Button>
                         </Modal.Footer>
                     </Modal>

@@ -38,11 +38,11 @@ const getEmployeeDetails = async (req, res) => {
         totalEmployees = await employee.countDocuments(queryObject);
         numberOfPages = Math.ceil(totalEmployees / limit);
 
-        completeEmployee = await employees.sort({ 'joiningDate': sort }).select('-password').select('-userType');
+        completeEmployee = await employees.sort({ 'joiningDate': sort }).select('-password');
         res.status(200).json({ completeEmployee, totalEmployees, numberOfPages });
     }
     else {
-        completeEmployee = await employees.select('-password').select('-userType');
+        completeEmployee = await employees.select('-password');
         res.status(200).json({ completeEmployee });
     }
 

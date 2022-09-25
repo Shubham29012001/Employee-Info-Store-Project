@@ -87,6 +87,10 @@ span {
   font-size: 25px !important;
 }
 
+svg {
+  cursor: pointer !important;
+}
+
 .delete {
   color: red;
   cursor: pointer;
@@ -132,4 +136,8 @@ tr {
   margin-right: 10px;
   margin-bottom: 5px;
   font-size: 25px !important;
+}
+
+.access {
+  color: green !important;
 }

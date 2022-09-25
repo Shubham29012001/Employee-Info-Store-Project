@@ -45,6 +45,7 @@ function App() {
               )}
           </>
         )}
+        <Route path="/*" exact element={<Navigate replace to="/login" />} />
       </Routes>
       <ToastContainer autoClose={2000} limit={3} />
     </>
