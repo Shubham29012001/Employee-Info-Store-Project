@@ -12,24 +12,42 @@ import {
     loginContext
 } from '../context/contextProvider.js';
 
+import moment from 'moment';
+
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { Tooltip, IconButton } from '@mui/material';
 import { toast } from 'react-toastify';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AuthServices from '../../ApiServices/authServices.js';
-import CancelIcon from '@mui/icons-material/Cancel';
 import Swal from 'sweetalert2'
 import GridTable from "@nadavshaar/react-grid-table";
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
+import PersonOffIcon from '@mui/icons-material/PersonOff';
+import { MuiChipsInput } from 'mui-chips-input'
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 
 const Meeting = () => {
+
+    const useStyles = makeStyles((theme) =>
+        createStyles({
+            root: {
+                width: 500,
+                '& > * + *': {
+                    marginTop: theme.spacing(3),
+                },
+            },
+        }),
+    );
 
     const [row, setRow] = useState([]);
     const [loading, setLoading] = useState(false);
     const [show, setShow] = useState(false);
     const [editShow, seteditShow] = useState(false);
+    const [email, setEmail] = useState([]);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -46,11 +64,33 @@ const Meeting = () => {
         _id: "",
         meetingRoom: "",
         meetTitle: "",
-        meetCreatedBy: loginData.email,
-        meetMembers: "",
+        meetCreatedBy: JSON.parse(localStorage.getItem('userDetails')).email,
+        meetMembers: [],
         meetStartingTime: "",
         meetEndingTime: "",
     });
+
+    const getEmployeesEmail = async () => {
+        try {
+            const { data: res } = await AuthServices.getEmployeesEmail();
+            if (res) {
+
+                const fetchEmail = res.allEmails.map(function (obj) {
+                    return obj.email;
+                })
+
+                setEmail(fetchEmail);
+            }
+        }
+        catch (error) {
+            console.log(error.response.data.msg);
+            setloginData(null)
+            localStorage.removeItem('userDetails');
+            setLoading(false)
+        }
+    }
+
+    const classes = useStyles();
 
     const handleChange = ({ currentTarget: input }) => {
         setData({ ...data, [input.name]: input.value });
@@ -118,13 +158,13 @@ const Meeting = () => {
                 return (
                     <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
                         <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
-                            {data.meetMembers.map((v, id) => {
-                                return (
-                                    <ul style={{ margin: "0", padding: "0" }}>
-                                        <tr key={id + 1} ><td>{id + 1}) {v}</td></tr>
-                                    </ul>
-                                )
-                            })}
+                            <ul style={{ marginTop: "10px", padding: "0" }}>
+                                {data.meetMembers.map((v, id) => {
+                                    return (
+                                        <li key={id + 1} >{id + 1}) {v}</li>
+                                    )
+                                })}
+                            </ul>
                         </div>
                     </div>
                 )
@@ -139,7 +179,7 @@ const Meeting = () => {
                 return (
                     <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
                         <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
-                            {new Date(data.meetStartingTime).toLocaleString('en-GB', { timeZone: 'IST' })}<br /> {new Date(data.meetEndingTime).toLocaleString('en-GB', { timeZone: 'IST' })}
+                            {moment(data.meetStartingTime).format("DD/MM/YYYY, hh:mm A")}<br /> {moment(data.meetEndingTime).format("DD/MM/YYYY, hh:mm A")}
                         </div>
                     </div>
                 )
@@ -154,11 +194,12 @@ const Meeting = () => {
                     <>
                         <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
                             <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
-                                <Tooltip title="Abort Meeting">
+                                {data.meetMembers.includes(loginData.name) && <Tooltip title="Abort Meeting">
                                     <IconButton onClick={() => abortMeeting(data._id)}>
-                                        <CancelIcon className="logo abort" />
+                                        <PersonOffIcon className="logo abort" />
                                     </IconButton>
-                                </Tooltip>
+                                </Tooltip>}
+
                                 {
                                     (loginData.userType === 755 || loginData.userType === 955 || loginData.email === data.meetCreatedBy) &&
                                     <>
@@ -213,8 +254,8 @@ const Meeting = () => {
         try {
             const { data: res } = await AuthServices.getMeeting(id);
             if (res) {
-                res.individualMeetDetails.meetStartingTime = res.individualMeetDetails.meetStartingTime.split('.')[0]
-                res.individualMeetDetails.meetEndingTime = res.individualMeetDetails.meetEndingTime.split('.')[0];
+                res.individualMeetDetails.meetStartingTime = moment(res.individualMeetDetails.meetStartingTime).format("yyyy-MM-DDTHH:mm");
+                res.individualMeetDetails.meetEndingTime = moment(res.individualMeetDetails.meetEndingTime).format("yyyy-MM-DDTHH:mm");
                 setData(res.individualMeetDetails);
             }
         }
@@ -238,7 +279,6 @@ const Meeting = () => {
             try {
                 const { data: res } = await AuthServices.updateMeeting(data._id, data);
                 if (res) {
-                    console.log(res)
                     toast.success('Meeting Updated Successfully');
                     setData('')
                     setupdateMeetData(res);
@@ -308,6 +348,7 @@ const Meeting = () => {
 
     useEffect(() => {
         getMeetingsData();
+        getEmployeesEmail();
     }, []);  // // Delete Users in Backend
 
 
@@ -315,11 +356,11 @@ const Meeting = () => {
         <>
             <div className="mt-3">
                 <div className="container">
-                    {loading === false ? <> <Loader /> </> : <><h1> <GroupsIcon /> Meetings</h1>
-                        <div className="add-btn mt-2 btn btn-primary navlink createMeeting" onClick={handleShow}>
+                    {loading === false ? <> <Loader /> </> : <>
+                        <div className="add-btn mt-4 btn btn-primary navlink createMeeting mb-4" onClick={handleShow}>
                             Create Meetings <AddIcon />
                         </div>
-                        <GridTable columns={columns} rows={row} pageSize={4} requestDebounceTimeout={500} />
+                        <GridTable className="mt-3 gridtable" columns={columns} rows={row} pageSize={4} requestDebounceTimeout={500} />
                     </>}
 
                     <Modal size="lg" show={show} onHide={handleClose} centered>
@@ -361,14 +402,20 @@ const Meeting = () => {
                                         <label htmlFor="meetMembers" className="form-label">
                                             Meet Members
                                         </label>
-                                        <input
-                                            type="chip"
-                                            className="form-control"
+                                        <Autocomplete
+                                            multiple
+                                            limitTags={3}
                                             id="meetMembers"
-                                            aria-describedby="meetMembersHelp"
-                                            name="meetMembers"
-                                            value={data.meetMembers}
-                                            onChange={handleChange}
+                                            options={email}
+                                            onChange={(event, value) => {
+                                                setData({
+                                                    ...data,
+                                                    meetMembers: value
+                                                })
+                                            }}
+                                            renderInput={(params) => (
+                                                <TextField {...params} variant="outlined" placeholder="Meet Members" />
+                                            )}
                                         />
                                     </div>
                                     <div className="mb-3 col-lg-6 col-md-6 col-12">
@@ -465,14 +512,21 @@ const Meeting = () => {
                                         <label htmlFor="meetMembers" className="form-label">
                                             Meet Members
                                         </label>
-                                        <input
-                                            type="chip"
-                                            className="form-control"
+                                        <Autocomplete
+                                            multiple
+                                            limitTags={3}
                                             id="meetMembers"
-                                            aria-describedby="meetMembersHelp"
-                                            name="meetMembers"
-                                            value={data.meetMembers}
-                                            onChange={handleChange}
+                                            options={email}
+
+                                            onChange={(event, value) => {
+                                                setData({
+                                                    ...data,
+                                                    meetMembers: value
+                                                })
+                                            }}
+                                            renderInput={(params) => (
+                                                <TextField {...params} variant="outlined" placeholder="Meet Members" />
+                                            )}
                                         />
                                     </div>
                                     <div className="mb-3 col-lg-6 col-md-6 col-12">

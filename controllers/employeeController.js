@@ -1,8 +1,12 @@
 const employee = require('../models/employee');
 const { badRequestError, customAPIError } = require('../errors/')
 
+
 const getEmployeeDetails = async (req, res) => {
-    const { sort, team, designation, reporting, search, limit, page } = req.query;
+    const { sort, team, designation, reporting } = req.query;
+
+    let limit = parseInt(req.query.limit) || 7;
+    let page = parseInt(req.query.page) || 1;
 
     let skip = 0;
 
@@ -24,28 +28,15 @@ const getEmployeeDetails = async (req, res) => {
         queryObject.reportingTo = new RegExp(reporting, 'i');
     }
 
-    if (search) {
-        queryObject.name = new RegExp(`^${search}`, 'i');
-    }
-
     let employees = employee.find(queryObject).select('-password');
-    let totalEmployees;
-    let numberOfPages;
-    let completeEmployee;
 
-    if (limit || page || sort) {
-        employees = employees.skip(skip).limit(limit);
-        totalEmployees = await employee.countDocuments(queryObject);
-        numberOfPages = Math.ceil(totalEmployees / limit);
+    employees = employees.skip(skip).limit(limit);
+    const completeEmployee = await employees.sort({ 'joiningDate': sort }).select('-password');
 
-        completeEmployee = await employees.sort({ 'joiningDate': sort }).select('-password');
-        res.status(200).json({ completeEmployee, totalEmployees, numberOfPages });
-    }
-    else {
-        completeEmployee = await employees.select('-password');
-        res.status(200).json({ completeEmployee });
-    }
+    const totalEmployees = await employee.countDocuments(queryObject);
+    const numberOfPages = Math.ceil(totalEmployees / limit);
 
+    res.status(200).json({ completeEmployee, totalEmployees, numberOfPages });
 };
 
 const getIndividualEmployeeDetails = async (req, res) => {
@@ -150,11 +141,23 @@ const updateIndividualEmployeeDetail = async (req, res) => {
 };
 
 
+const getEmployeesEmail = async (req, res) => {
+
+    const allEmails = await employee.find({}).select('email');
+    if (allEmails) {
+        res.status(200).json({ allEmails });
+    }
+    else {
+        throw new badRequestError(`No Employee with id ${id}`);
+    }
+};
+
 module.exports = {
     getEmployeeDetails,
     deleteIndividualEmployeeDetails,
     getIndividualEmployeeDetails,
     updateIndividualEmployeeDetail,
     getEmployeeByTeam,
-    giveAdminAccess
+    giveAdminAccess,
+    getEmployeesEmail
 }

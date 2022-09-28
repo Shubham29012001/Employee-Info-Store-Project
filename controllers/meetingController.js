@@ -61,8 +61,8 @@ const createMeetingDetails = async (req, res) => {
     let meetStartingTime = req.body.meetStartingTime;
     let meetEndingTime = req.body.meetEndingTime;
     let meetMembers = req.body.meetMembers;
-    meetMembers = meetMembers.replace(' ', '').split(',');
     meetMembers.push(meetCreatedBy);
+    console.log(meetMembers)
     meetStartingTime = meetStartingTime.split(':')[0].concat(':00');
     meetEndingTime = meetEndingTime.split(':')[0].concat(':00');
 
@@ -73,12 +73,11 @@ const createMeetingDetails = async (req, res) => {
         const memberAlreadyMeet = [];
         const totalDuration = (meetEndingTime - meetStartingTime) / 3600000;
         const memberName = [];
-        console.log(meetingRoom)
         const findMeetRoomSchedule = await meeting.findOne({ meetingRoom, meetStartingTime, meetEndingTime });
         if (!findMeetRoomSchedule) {
             for (let i = 0; i < meetMembers.length; i++) {
                 const memberResult = await employee.findOne({ email: meetMembers[i] }).select('name');
-
+                console.log(meetMembers[i])
                 if (memberResult) {
                     memberName.push(memberResult.name);
                 }
@@ -97,7 +96,7 @@ const createMeetingDetails = async (req, res) => {
                 res.status(201).json({ createMeeting, msg: "Meet created successfully" });
             }
             else {
-                throw new badRequestError(`[${memberAlreadyMeet}] is already in meet for particular slot`);
+                throw new badRequestError(`${memberAlreadyMeet} is already in meet for particular slot`);
             }
         }
         else {
@@ -134,10 +133,14 @@ const updateIndividualMeetingDetails = async (req, res) => {
     const { meetTitle, meetCreatedBy, meetingRoom } = req.body;
     let meetStartingTime = req.body.meetStartingTime;
     let meetEndingTime = req.body.meetEndingTime;
-
     let meetMembers = req.body.meetMembers;
+
     const meetID = req.params.id;
-    meetMembers = meetMembers.replace(' ', '').split(',');
+
+    if (!Array.isArray(meetMembers)) {
+        meetMembers = meetMembers.replaceAll(/\s/g, "").split(',');
+    }
+
     meetStartingTime = meetStartingTime.split(':')[0].concat(':00');
     meetEndingTime = meetEndingTime.split(':')[0].concat(':00');
 
@@ -146,7 +149,7 @@ const updateIndividualMeetingDetails = async (req, res) => {
     }
 
     else {
-        const findMeetRoomSchedule = await meeting.findOne({ meetingRoom, meetStartingTime, meetEndingTime });
+        const findMeetRoomSchedule = await meeting.findOne({ meetingRoom, meetStartingTime, meetEndingTime, _id: { $nin: [meetID] } });
         if (!findMeetRoomSchedule) {
             const isMeet = await meeting.findById({ _id: meetID });
             if (isMeet) {
@@ -156,6 +159,9 @@ const updateIndividualMeetingDetails = async (req, res) => {
                 for (let i = 0; i < meetMembers.length; i++) {
                     const memberResult = await employee.findOne({ email: meetMembers[i] }).select('name');
                     memberName.push(memberResult.name);
+                }
+
+                for (let i = memberName.length; i < meetMembers.length; i++) {
                     const isMemberConflict = await meeting.findOne({ meetMembers: meetMembers[i], meetStartingTime: meetStartingTime, meetEndingTime: meetEndingTime });
 
                     if (isMemberConflict) {
@@ -163,8 +169,9 @@ const updateIndividualMeetingDetails = async (req, res) => {
                     }
                 }
 
+
                 if (memberAlreadyMeet.length == 0) {
-                    const updateMeeting = await meeting.findByIdAndUpdate({ _id: meetID }, { meetTitle, meetCreatedBy, meetMembers, meetStartingTime, meetEndingTime }, { new: true, runValidators: true });
+                    const updateMeeting = await meeting.findByIdAndUpdate({ _id: meetID }, { meetTitle, meetCreatedBy, meetMembers, meetStartingTime, meetEndingTime, meetingRoom }, { new: true, runValidators: true });
                     res.status(200).json({ updateMeeting, msg: "Meet updated successfully" });
                 }
                 else {

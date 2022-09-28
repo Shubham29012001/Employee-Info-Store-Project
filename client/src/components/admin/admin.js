@@ -19,6 +19,8 @@ import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import SaveIcon from '@mui/icons-material/Save';
+import moment from 'moment';
+import _ from "lodash";
 
 import {
   addUserDataContext,
@@ -34,6 +36,10 @@ import AuthServices from '../../ApiServices/authServices.js';
 const Admin = () => {
   const [loading, setLoading] = useState(false);
   const [row, setRow] = useState([]);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [numberOfPages, setNumberOfPages] = useState(0);
+  const [total, setTotal] = useState(0);
+  const pages = new Array(numberOfPages).fill(null).map((v, i) => i);
 
   const [show, setShow] = useState(false);
   const [editShow, seteditShow] = useState(false);
@@ -99,7 +105,7 @@ const Admin = () => {
         return (
           <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
             <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
-              {new Date(value).toLocaleString('en-GB', { timeZone: 'IST' })}
+              {moment(value).format("DD/MM/YYYY, hh:mm A")}
             </div>
           </div>
         )
@@ -110,7 +116,6 @@ const Admin = () => {
       field: "actions",
       label: "Actions",
       cellRenderer: ({ tableManager, value, field, data, column, colIndex, rowIndex }) => {
-        console.log(data)
         return (
           <>
             <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
@@ -190,7 +195,7 @@ const Admin = () => {
         return (
           <div data-row-id={rowIndex} data-row-index={rowIndex} data-column-id={colIndex} className={`rgt-cell rgt-row-${rowIndex} rgt-row-odd rgt-cell-name`} >
             <div className={`rgt-cell-inner rgt-text-truncate`} title={`${rowIndex}`} >
-              {new Date(value).toLocaleString('en-GB', { timeZone: 'IST' })}
+              {moment(value).format("DD/MM/YYYY, hh:mm A")}
             </div>
           </div>
         )
@@ -213,16 +218,30 @@ const Admin = () => {
     joiningDate: "",
   });
 
-  const handleChange = ({ currentTarget: input }) => {
-    setData({ ...data, [input.name]: input.value });
-  };
+  const [form, setForm] = useState({
+    _id: "",
+    name: "",
+    email: "",
+    address: "",
+    dob: "",
+    designation: "",
+    reportingTo: "",
+    seat: "",
+    team: "",
+    preferenceStartTime: "",
+    preferenceEndTime: "",
+    joiningDate: "",
+  });
 
-  const getEmployeesData = async () => {
+
+  const getEmployeesData = async (e) => {
     try {
       if (loginData.userType === 755 || loginData.userType === 955) {
-        const { data: res } = await AuthServices.getEmployees();
+        const { data: res } = await AuthServices.getEmployees(pageNumber, form);
         if (res) {
           setRow(res.completeEmployee);
+          setNumberOfPages(res.numberOfPages)
+          setTotal(res.totalEmployees);
         }
       }
       else if (loginData.userType === 255) {
@@ -242,20 +261,30 @@ const Admin = () => {
     }
   }
 
+  const handleChange = ({ currentTarget: input }) => {
+    setForm({ ...form, [input.name]: input.value });
+  };
+
+  const checkboxChange = ({ currentTarget }) => {
+    setForm({ ...form, [currentTarget.name]: !currentTarget.checked });
+  };
+
+  const handleDataChange = ({ currentTarget: input }) => {
+    setData({ ...data, [input.name]: input.value });
+  };
+
   const getEmployeeData = async (id) => {
     try {
       const { data: res } = await AuthServices.getEmployee(id);
       if (res) {
-        console.log(res)
-        res.individualEmployee.dob = res.individualEmployee.dob.split('T')[0]
-        res.individualEmployee.joiningDate = res.individualEmployee.joiningDate.split('.')[0];
+        res.individualEmployee.dob = moment(res.individualEmployee.dob).format("YYYY-MM-DD");
+        res.individualEmployee.joiningDate = moment(res.individualEmployee.joiningDate).format("YYYY-MM-DDTHH:mm");
         setUserData(res.individualEmployee);
         setData(res.individualEmployee);
       }
     }
     catch (error) {
       console(error.response.data.msg);
-      localStorage.removeItem('userDetails');
       setloginData(null);
     }
   };
@@ -265,6 +294,7 @@ const Admin = () => {
     try {
       const { data: res } = await AuthServices.updateEmployee(data._id, data);
       if (res) {
+        setPageNumber(pageNumber)
         handleEditClose();
         handleClose();
         getEmployeesData();
@@ -280,7 +310,7 @@ const Admin = () => {
 
   useEffect(() => {
     getEmployeesData();
-  }, []);  // // Delete Users in Backend
+  }, [pageNumber, form]);  // // Delete Users in Backend
 
   const giveAdminAccess = async (id, userType) => {
     try {
@@ -301,6 +331,7 @@ const Admin = () => {
         if (swalFire.isConfirmed) {
           const { data: res } = await AuthServices.giveAdminAccess(id);
           if (res) {
+            setPageNumber(pageNumber)
             getEmployeesData();
             toast.success(res.msg)
           }
@@ -332,6 +363,7 @@ const Admin = () => {
         if (swalFire.isConfirmed) {
           const { data: res } = await AuthServices.deleteEmployee(id);
           if (res) {
+            setPageNumber(pageNumber)
             handleClose();
             getEmployeesData();
             setdeleteUserData(deleteUserData);
@@ -347,6 +379,107 @@ const Admin = () => {
   }
 
 
+  const Pagination = ({
+    tableManager,
+    onChange = tableManager.paginationApi.setPage,
+  }) => {
+    const {
+      config: {
+        texts: {
+          prev: prevText,
+          page: pageText,
+          next: nextText,
+          of: ofText,
+        },
+        additionalProps: { pagination: additionalProps = {} },
+      },
+      paginationApi: { totalPages },
+    } = tableManager;
+
+    let backButtonDisabled = pageNumber - 1 < 1;
+    let nextButtonDisabled = pageNumber + 1 > numberOfPages;
+
+    let classNames = (
+      "rgt-footer-pagination " + (additionalProps.className || "")
+    ).trim();
+
+    return (
+      <div {...additionalProps} className={classNames}>
+        <button
+          className={`rgt-footer-pagination-button${backButtonDisabled ? " rgt-disabled-button" : ""
+            }`}
+          disabled={pageNumber < 1}
+          onClick={() => {
+            setPageNumber(Math.max(0, pageNumber - 1));
+          }}
+        >
+          {prevText}
+        </button>
+
+        <div className="rgt-footer-pagination-input-container">
+          <span>{pageText} </span>
+          <input
+            onClick={(event) => event.target.select()}
+            className="rgt-footer-page-input"
+            type="number"
+            value={numberOfPages ? Math.max(pageNumber, 1) : 0}
+            onChange={(event) => onChange(event.target.value * 1)}
+          />
+          <span>
+            {ofText} {numberOfPages}
+          </span>
+        </div>
+
+        <button
+          className={`rgt-footer-pagination-button${nextButtonDisabled ? " rgt-disabled-button" : ""
+            }`}
+          disabled={pageNumber + 1 > numberOfPages}
+          onClick={() => {
+            setPageNumber(Math.max(pageNumber + 1, numberOfPages));
+          }}
+        >
+          {nextText}
+        </button>
+      </div >
+    );
+  };
+
+
+  const Information = ({
+    tableManager,
+    pageSize = tableManager.paginationApi.pageSize,
+    pageCount = tableManager.paginationApi.pageRows.length,
+  }) => {
+    const {
+      config: {
+        isPaginated,
+        texts: {
+          totalRows: totalRowsText,
+          rows: rowsText,
+        },
+        additionalProps: { information: additionalProps = {} },
+      },
+      paginationApi: { page },
+    } = tableManager;
+
+    let classNames = (
+      "rgt-footer-items-information " + (additionalProps.className || "")
+    ).trim();
+
+    return (
+      <div {...additionalProps} className={classNames}>
+        {totalRowsText} {total || 0}&nbsp;
+        {!isPaginated
+          ? ""
+          : `| ${rowsText} ${!pageCount
+            ? "0"
+            : `${pageSize * (page - 1) + 1} - ${pageSize * (page - 1) + pageCount
+            }`
+          }`}{" "}
+      </div>
+    );
+  };
+
   return (
     <>
 
@@ -354,10 +487,37 @@ const Admin = () => {
         <div className="container">
           {loading === false ? (<Loader />) : (
             <>
-              <h1>
-                <BadgeIcon /> Employees
-              </h1>
-              <GridTable columns={columns} rows={row} pageSize={8} requestDebounceTimeout={500} />
+              {(loginData.userType === 755 || loginData.userType === 955) &&
+                <form onSubmit={getEmployeesData}>
+                  <div className="input_container">
+                    <div className="admin_input">
+                      <label htmlFor="designation">Designation: </label>
+                      <input type="text" value={form.designation} onChange={handleChange}
+
+                        name="designation" />
+                    </div>
+                    <div className="admin_input">
+                      <label htmlFor="team">Team: </label>
+                      <input type="text" value={form.team} onChange={handleChange}
+
+                        name="team" />
+                    </div>
+                    <div className="admin_input">
+                      <label htmlFor="reporting">Reporting To: </label>
+                      <input type="text" value={form.reportingTo} onChange={handleChange}
+
+                        name="reporting" />
+                    </div>
+                    <div className="admin_input">
+                      <label htmlFor="joiningDate">Sort: </label>
+                      <input type="checkbox" defaultChecked={form.joiningDate} onChange={checkboxChange}
+                        name="joiningDate" />
+                    </div>
+                  </div>
+                </form>
+              }
+
+              <GridTable className="gridtable" columns={columns} rows={row} pageSize={7} requestDebounceTimeout={500} components={{ Pagination, Information }} />
 
               <Modal show={show} onHide={handleClose} centered>
                 <Modal.Body>
@@ -441,7 +601,7 @@ const Admin = () => {
                           id="name"
                           name="name"
                           aria-describedby="nameHelp"
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                           value={data.name}
                         />
                       </div>
@@ -456,7 +616,7 @@ const Admin = () => {
                           name="designation"
                           aria-describedby="designationHelp"
                           value={data.designation}
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
                       </div>
                       <div className="mb-3 col-lg-6 col-md-6 col-12">
@@ -470,7 +630,7 @@ const Admin = () => {
                           aria-describedby="dobHelp"
                           name="dob"
                           value={data.dob}
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
                       </div>
                       <div className="mb-3 col-lg-6 col-md-6 col-12">
@@ -484,7 +644,7 @@ const Admin = () => {
                           aria-describedby="reportingToHelp"
                           name="reportingTo"
                           value={data.reportingTo}
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
                       </div>
                       <div className="mb-3 col-lg-6 col-md-6 col-12">
@@ -498,7 +658,7 @@ const Admin = () => {
                           aria-describedby="emailHelp"
                           name="email"
                           value={data.email}
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
                       </div>
                       <div className="mb-3 col-lg-6 col-md-6 col-12">
@@ -512,7 +672,7 @@ const Admin = () => {
                           aria-describedby="seatHelp"
                           name="seat"
                           value={data.seat}
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
                       </div>
                       <div className="mb-3 col-lg-6 col-md-6 col-12">
@@ -525,7 +685,7 @@ const Admin = () => {
                           id="team"
                           name="team"
                           value={data.team}
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
 
                       </div>
@@ -540,7 +700,7 @@ const Admin = () => {
                           aria-describedby="joiningDateHelp"
                           name="joiningDate"
                           value={data.joiningDate}
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
                       </div>
                       <div className="mb-3">
@@ -554,7 +714,7 @@ const Admin = () => {
                           rows={2}
                           name="address"
                           value={data.address}
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
                       </div>
                       <div className="mb-3 col-lg-6 col-md-6 col-12">
@@ -568,7 +728,7 @@ const Admin = () => {
                           name="preferenceStartTime"
                           value={data.preferenceStartTime}
                           placeholder="In 24 Hour Format (T10:00)"
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
 
                       </div>
@@ -584,7 +744,7 @@ const Admin = () => {
                           name="preferenceEndTime"
                           value={data.preferenceEndTime}
                           placeholder="In 24 Hour Format (T18:00)"
-                          onChange={handleChange}
+                          onChange={handleDataChange}
                         />
                       </div>
                     </div>

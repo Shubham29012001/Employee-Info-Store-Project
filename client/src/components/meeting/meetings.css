@@ -29,3 +29,20 @@ h1 {
   background-color: #25316d !important;
   color: white !important;
 }
+
+.gridtable:hover {
+  cursor: pointer;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.chips {
+  outline: none !important;
+  border: none !important;
+}
+.MuiChip-label {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
+  font-size: 0.8125rem !important;
+}
+
+.MuiInputBase-root {
+}

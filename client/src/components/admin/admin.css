@@ -1,26 +1,5 @@
-.pagination {
-  position: fixed;
-  bottom: 25px;
-  left: 43% !important;
-}
-
-.pagination button {
-  color: #25316d;
-  padding: 3px !important;
-  margin: 10px;
-  width: 40px;
-}
-
-.pagination span {
-  font-size: 15px !important;
-}
-
-h1 {
-  font-size: 30px !important;
-}
-
 .input_container {
-  margin: 50px 50px 0px 50px;
+  margin: 45px 50px 0px 50px;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -140,4 +119,13 @@ tr {
 
 .access {
   color: green !important;
+}
+
+.gridtable {
+  margin-top: 45px !important;
+}
+
+.gridtable:hover {
+  cursor: pointer;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
 }
