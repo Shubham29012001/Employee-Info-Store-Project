@@ -61,7 +61,6 @@ app.use(
 app.use('/api/v1/', authRoute);
 app.use('/api/v1/employees/', authenticate, employeeRoute);
 app.use('/api/v1/meetings/', authenticate, meetingRoute);
-app.use('*', pageNotFoundRoute);
 
 app.use(errorHandlerMiddleware);
 
