@@ -6,24 +6,3 @@ updates:
       interval: "daily"  # Update the frequency of dependency checks
     commit-message:
       prefix: "chore(deps):"  # Customize the commit message prefix
-    commit-url:
-      format: "[{{ name }} {{ from_version }} ➜ {{ to_version }}]({{ url }})"
-    title: "Dependency update for {{ name }} from {{ from_version }} to {{ to_version }}"  # Customize the PR title
-    body: |
-      Release: 1.0.0
-            
-      Type: Chore
-      
-      **Description:**
-      
-      ---
-      <!-- Changelog here -->
-      
-      <!-- Default Dependabot body -->
-
-      <hr />
-      
-      ### Checklist
-      - [ ] [Added UTs](## 'Added UTs for the modified code?')
-      - [ ] [Documented](## 'Documented the newly added/modified code?')
-      - [ ] [Locally tested](## 'Tested locally?')
