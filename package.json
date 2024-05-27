@@ -16,7 +16,7 @@
   "author": "Shubham Maurya",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "3.1.0"
+    "nodemon": "3.1.1"
   },
   "dependencies": {
     "bcrypt": "5.0.1",
