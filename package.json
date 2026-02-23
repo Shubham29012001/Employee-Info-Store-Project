@@ -16,10 +16,10 @@
   "author": "Shubham Maurya",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "3.1.9"
+    "nodemon": "3.1.14"
   },
   "dependencies": {
-    "bcrypt": "5.0.1",
+    "bcrypt": "6.0.0",
     "compression": "1.8.0",
     "cors": "2.8.5",
     "dotenv": "16.4.7",
