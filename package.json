@@ -29,7 +29,7 @@
     "helmet": "6.0.0",
     "jsonwebtoken": "8.5.1",
     "lodash": "4.17.23",
-    "mongoose": "6.13.6",
+    "mongoose": "6.13.9",
     "xss-clean": "0.1.1"
   }
 }
